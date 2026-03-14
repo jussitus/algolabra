@@ -4,7 +4,7 @@ class Edge:
     """Delaunay triangulaation peruspalikka, placeholder"""
 
     def __init_(self):
-        self.data = None # poista jos jää ilman käyttöä
+        self.data = None
         self.org = None
         self.onext: Edge = None
         self.rot: Edge = None

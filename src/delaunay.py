@@ -2,7 +2,7 @@ from edge import Edge, makeQuadEdge, splice, connect, deleteEdge
 from condition import ccw, inCircle, rightOf, leftOf, valid
 
 def delaunay(s) -> (Edge, Edge):
-    # remember to sort in x direction
+    # s must be sorted in increasing x direction
     if len(s) == 2:
         a = makeQuadEdge(s[0],s[1])
         return (a, a.sym)
@@ -46,14 +46,16 @@ def delaunay(s) -> (Edge, Edge):
                     deleteEdge(lcand)
                     lcand = t
             rcand = basel.oprev
+
             if valid(rcand,basel):
                 while inCircle(basel.dest,basel.org,rcand.dest,rcand.oprev.dest):
                     t = rcand.oprev
                     deleteEdge(rcand)
                     rcand = t
+
             if not valid(lcand,basel) and not valid(rcand,basel):
                 break
-            # magic tests
+
             if not valid(lcand,basel) or (valid(rcand,basel) and inCircle(lcand.dest, lcand.org, rcand.org, rcand.dest)):
                 basel = connect(rcand,basel.sym)
             else:
