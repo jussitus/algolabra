@@ -14,3 +14,12 @@ def inCircle(a,b,c,d):
         [d[0], d[1], (d[0])**2 + (d[1])**2, 1]]
         ) > 0
 
+def rightOf(x,e):
+    return ccw(x, e.dest, e.org)
+
+def leftOf(x,e):
+    return ccw(x, e.org, e.dest)
+
+# e above basel?
+def valid(e,basel):
+    return ccw(e.dest,basel.dest, basel.org)

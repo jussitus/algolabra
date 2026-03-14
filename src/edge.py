@@ -58,6 +58,13 @@ class Edge:
     def oprev(self, value):
         self.rot.onext.rot = value
 
+    @property
+    def rprev(self):
+        return self.sym.onext
+    @rprev.setter
+    def rprev(self, value):
+        self.sym.onext = value
+
 def makeQuadEdge(org, dest):
     e = Edge()
     eSym = Edge()
