@@ -21,7 +21,7 @@ Kokonaisuudessaan ohjelma toimii näin:
 
 1. Syöte on pisteiden määrä `n`. Generoidaan satunnaisesti joukko ruudukon pisteitä ja huoneita, niin että huoneet eivät ole ruudukossa päällekkäin.
 2. Lasketaan pisteiden Delaunayn triangulaatio. <- ydinalgoritmi
-3. Askeleesta 2. saadaan kaksi triangulaation sivua. Käydään triangulaatio läpi ja muodostetaan verkon vieruslista.
+3. Vaiheesta 2 saadaan kaksi triangulaation sivua. Käydään triangulaatio läpi ja muodostetaan verkon vieruslista.
 4. Lasketaan verkon pienin virittävä puu. Lisätään satunnaisia kaaria koko verkosta.
 5. Muodostetaan ruudukossa käytäviä huoneiden välillä polunetsintäalgoritmilla.
 6. Tulostetaan labyrintti jotain Python grafiikkakirjastoa käyttäen.
