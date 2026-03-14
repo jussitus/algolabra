@@ -54,7 +54,7 @@ V = pisteet, E = sivut
 - Guibasin ja Stolfin algoritmin aikavaativuus on `O(|V| log|V|)`
 - - oletettavasti puolitus `O(log |V|)` kertaa ja lomitus `O(|V|)`
 - Vieruslistan muodostus on `O(|E|)`(?), Primin algoritmi `O(|E| log|V|)`
-- A\* on O(|E| log|V|)
+- A\* on `O(|E| log|V|)`
 
 
 ## Muuta
