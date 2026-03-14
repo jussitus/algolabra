@@ -32,7 +32,7 @@ Lopullinen tulos on ruudukko, jossa jotkin ruudut muodostavat suorakulmiomaisia 
 
 Aion laskea Delaunayn triangulaation toteuttamalla Guibasin ja Stolfin hajota ja hallitse -algoritmin:
 
-[Leonidas Guibas and Jorge Stolfi. 1985. Primitives for the manipulation of general subdivisions and the computation of Voronoi. ACM Trans. Graph. 4, 2 (April 1985), 74–123.](http://mesh.brown.edu/DGP/pdfs/Guibas-tog85.pdf)
+[Leonidas Guibas and Jorge Stolfi. 1985. Primitives for the manipulation of general subdivisions and the computation of Voronoi. ACM Trans. Graph. 4, 2 (April 1985), 74–123.](https://dl.acm.org/doi/10.1145/282918.282923)
 
 Artikkelissa käytetään tietorakennetta quad-edge (nelisivu?). Tässä toteutuksessa ei kuitenkaan tarvita sen kaikkia komponentteja ja funktioita, koska algoritmissa ei poiketa duaalin (Voronoin diagrammin) puolelle.
 
