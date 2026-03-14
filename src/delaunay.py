@@ -1,33 +1,33 @@
 from edge import Edge, makeQuadEdge, splice, connect, deleteEdge
 from condition import ccw, inCircle, rightOf, leftOf, valid
 
-def delaunay(s) -> (Edge, Edge)
+def delaunay(s) -> (Edge, Edge):
     # remember to sort in x direction
     if len(s) == 2:
         a = makeQuadEdge(s[0],s[1])
-        return (a, sym.a)
-    else if len(s) == 3:
+        return (a, a.sym)
+    elif len(s) == 3:
         a = makeQuadEdge(s[0],s[1])
         b = makeQuadEdge(s[1],s[2])
         splice(a.sym,b)
         if ccw(s[0],s[1],s[2]):
             c = connect(b,a)
             return (a,b.sym)
-        else if ccw(s[0],s[2],s[1]):
+        elif ccw(s[0],s[2],s[1]):
             c = connect(b,a)
             return (c.sym, c)
         else:
             return (a, b.sym)
 
     else:
-        mid = len(S) // 2
-        (ldo,ldi) = delaunay(S[:mid])
-        (rdi, rdo) = delaunay(S[mid:])
+        mid = len(s) // 2
+        (ldo,ldi) = delaunay(s[:mid])
+        (rdi, rdo) = delaunay(s[mid:])
 
         while True:
             if leftOf(rdi.org, ldi):
                 ldi = ldi.lnext
-            else if rightOf(ldi.org, rdi):
+            elif rightOf(ldi.org, rdi):
                 rdi = rdi.rprev
             else:
                 break
@@ -41,10 +41,11 @@ def delaunay(s) -> (Edge, Edge)
         while True:
             lcand = basel.sym.onext
             if valid(lcand,basel):
-                while inCircle(basel.dest,basel.org,lcand.dest,lcands.onext.dest):
+                while inCircle(basel.dest,basel.org,lcand.dest,lcand.onext.dest):
                     t = lcand.onext
                     deleteEdge(lcand)
                     lcand = t
+            rcand = basel.oprev
             if valid(rcand,basel):
                 while inCircle(basel.dest,basel.org,rcand.dest,rcand.oprev.dest):
                     t = rcand.oprev

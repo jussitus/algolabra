@@ -65,6 +65,9 @@ class Edge:
     def rprev(self, value):
         self.sym.onext = value
 
+    def __str__(self):
+        return "{" + f'org: {self.org}, dest: {self.dest}' + "}"
+
 def makeQuadEdge(org, dest):
     e = Edge()
     eSym = Edge()
