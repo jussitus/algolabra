@@ -1,0 +1,17 @@
+[project]
+name = "algolabra"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "jussitus"}
+]
+license = {text = "GPL-2.0-only"}
+readme = "README.md"
+requires-python = "^3.14"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
