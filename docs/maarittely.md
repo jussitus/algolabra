@@ -34,8 +34,6 @@ Aion laskea Delaunayn triangulaation toteuttamalla Guibasin ja Stolfin hajota ja
 
 [Leonidas Guibas and Jorge Stolfi. 1985. Primitives for the manipulation of general subdivisions and the computation of Voronoi. ACM Trans. Graph. 4, 2 (April 1985), 74–123.](http://mesh.brown.edu/DGP/pdfs/Guibas-tog85.pdf)
 
-(Tarkemmin tietorakenteista ja algoritmista myöhemmin [tässä dokumentissa](algoritmin_kuvaus.md)).
-
 Artikkelissa käytetään tietorakennetta quad-edge (nelisivu?). Tässä toteutuksessa ei kuitenkaan tarvita sen kaikkia komponentteja ja funktioita, koska algoritmissa ei poiketa duaalin (Voronoin diagrammin) puolelle.
 
 Algoritmi jakaa pistejoukon rekursiivisesti aina kahteen kunnes päästään perustapauksiin, joissa pisteitä on 2 tai 3. Kun nämä on kolmioitu, aletaan puolikkaita yhdistämään, jolloin joudutaan poistamaan sivuja vasemmasta ja oikeasta puolikkaasta ja lisäämään sivuja vasemman ja oikean puolikaan välille.
