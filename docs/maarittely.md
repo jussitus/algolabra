@@ -38,7 +38,7 @@ Artikkelissa käytetään tietorakennetta quad-edge (nelisivu?).
 
 Algoritmi jakaa pistejoukon rekursiivisesti aina kahteen kunnes päästään perustapauksiin, joissa pisteitä on 2 tai 3. Kun nämä on kolmioitu, aletaan puolikkaita yhdistämään, jolloin joudutaan poistamaan sivuja vasemmasta ja oikeasta puolikkaasta ja lisäämään sivuja vasemman ja oikean puolikaan välille.
 
-Päätökset tehdään `InCircle` (onko piste kolmen pisteen muodostaman ympyrän sisällä tai kehällä) ja `CCW` (muodostaako kolme pistettä suunnatun kolmion vastapäivään) -testien avulla. Algoritmi antaa kaksi sivua, jotka ovat uloimpien pisteiden vasemmanpuoleisimmasta pisteestä vastapäivään lähtevä sivu ja oikeanpuoleisimmasta pisteestä myötäpäivään lähtevä sivu.
+Päätökset tehdään `InCircle` (onko piste kolmen pisteen muodostaman ympyrän sisällä) ja `CCW` (muodostaako kolme pistettä suunnatun kolmion vastapäivään) -testien avulla. Algoritmi antaa kaksi sivua, jotka ovat uloimpien pisteiden vasemmanpuoleisimmasta pisteestä vastapäivään lähtevä sivu ja oikeanpuoleisimmasta pisteestä myötäpäivään lähtevä sivu.
 
 Lisäksi aion käyttää [tätä Ian Henryn blogipostausta](https://ianthehenry.com/posts/delaunay/), joka käsittelee Guibasin ja Stolfin algoritmeissa käytettävää tietorakennetta ja toteuttaa Delaunayn triangulaation artikkelissa esitetyllä toisella iteratiivisella algoritmilla.
 
