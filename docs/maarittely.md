@@ -5,7 +5,7 @@ Tämä on määrittely kurssilla "Aineopintojen harjoitustyö: Algoritmit ja tek
 
 Harjoitustyön aiheena on luolastojen/labyrinttien generointi. Labyrintit (dungeons) ovat monien pöytä- ja tietokoneroolipelien keskeinen tapahtumapaikka. Niiden voidaan katsoa koostuvan huoneista (tai luolista, yms.) ja huoneita yhdistävistä käytävistä. Hyvän labyrintin läpikäyminen vie aikaa, eli reitti kahden mielivaltaisen huoneen välillä voi kiertää euklidisesti pidempää reittiä. Hyvässä labyrintissa on kuitenkin myös pieniä syklejä, jottei läpikäydessä tarvitse peruutella liikaa.
 
-Ohjelma toteutaan Pythonilla.
+Ohjelma toteutetaan Pythonilla.
 
 Harjoitustyön toteutus koostuu muutamasta eri vaiheesta.
 
