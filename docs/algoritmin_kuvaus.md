@@ -1,6 +1,6 @@
 !!KESKEN!!
 
-Kaikkea quad-edgen komponentteja ei tarvita 2D Delaunayn triangulaatiossa, esim. Voronoin diagrammissa ei tarvitse liikkua, joten `e Flip`, `e Rot`, yms. ei tarvitse toteuttaa. Ehkä järkevämpää toteuttaa jokainen suunnattu sivu omana olionaan.
+Edge, QuadEdge, ja funktiot
 
 Splice
 
