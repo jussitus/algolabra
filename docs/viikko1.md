@@ -2,7 +2,7 @@
 
 ### Mitä olen tehnyt tällä viikolla? Mitä opin tällä viikolla / tänään?
 
-Kävin aloitusluennolla. Päätin toteuttaa labyrintin generoinnin. Halusin toteuttaa jonkin muun kuin Bowyerin-Watsonin algoritmin. Selailin kirjallisuutta (esim. Lee ja Schachter "Two Algorithms for Constructing a Delaunay Triangulation"). Päädyin lukemaan Guibasin ja Stolfin artikkelin, koska tietorakenteet siinä vaikuttivat mielenkiintoisilta. Skippasin kaikki todistukset ja en ymmärrä topologiasta juurikaan. Suurin osa ajasta meni juuri quad-edgen sisäistämiseen. Olen käynyt itse algoritmin vain pintapuolisesti läpi. Miten Splice toimii ja mitä merge loopissa tarkalleen tapahtuu on vielä hakusessa.
+Kävin aloitusluennolla. Päätin toteuttaa labyrintin generoinnin. Halusin toteuttaa jonkin muun kuin Bowyerin-Watsonin algoritmin. Selailin kirjallisuutta (esim. Lee ja Schachter "Two Algorithms for Constructing a Delaunay Triangulation"). Päädyin lukemaan Guibasin ja Stolfin artikkelin, koska tietorakenteet siinä vaikuttivat mielenkiintoisilta. Skippasin kaikki todistukset ja en ymmärrä topologiasta juurikaan. Suurin osa ajasta meni juuri quad-edgen sisäistämiseen. Olen käynyt itse algoritmin vain pintapuolisesti läpi. Miten Splice toimii ja mitä merge loopissa tarkalleen tapahtuu on vielä hakusessa. Tein git-repon ja 1. viikolta vaadittavat hommat.
 
 ### Miten ohjelma on edistynyt?
     

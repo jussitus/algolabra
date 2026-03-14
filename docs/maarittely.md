@@ -5,6 +5,8 @@ Tämä on määrittely kurssilla "Aineopintojen harjoitustyö: Algoritmit ja tek
 
 Harjoitustyön aiheena on luolastojen/labyrinttien generointi. Labyrintit (dungeons) ovat monien pöytä- ja tietokoneroolipelien keskeinen tapahtumapaikka. Niiden voidaan katsoa koostuvan huoneista (tai luolista, yms.) ja huoneita yhdistävistä käytävistä. Hyvän labyrintin läpikäyminen vie aikaa, eli reitti kahden mielivaltaisen huoneen välillä voi kiertää euklidisesti pidempää reittiä. Hyvässä labyrintissa on kuitenkin myös pieniä syklejä, jottei läpikäydessä tarvitse peruutella liikaa.
 
+Ohjelma toteutaan Pythonilla.
+
 Harjoitustyön toteutus koostuu muutamasta eri vaiheesta.
 
 Sen ydin on Delaunayn triangulaatio, joka jakaa pistejoukon konveksin verhon (convex hull, tässä tapauksessa ulkopisteistä muodostuva monikulmio) kolmioihin, niin että kaikki muut pisteet ovat kolmion kärjille piirretyn ympyrän ulkopuolella. Ohjelmassa pisteet ovat huoneiden keskipisteitä (tai jokin muu huoneen tietty piste) ja kolmioiden sivut mahdollisia yhteyksiä huoneiden välillä.
@@ -26,7 +28,7 @@ Kokonaisuudessaan ohjelma toimii näin:
 
 Lopullinen tulos on ruudukko, jossa jotkin ruudut muodostavat suorakulmiomaisia huoneita ja huoneiden välillä on käytäväruutuja.
 
-## Delaunayn triangulaation algoritmi
+## Algoritmi
 
 Aion laskea Delaunayn triangulaation toteuttamalla Guibasin ja Stolfin hajota ja hallitse -algoritmin:
 
@@ -36,7 +38,7 @@ Aion laskea Delaunayn triangulaation toteuttamalla Guibasin ja Stolfin hajota ja
 
 Artikkelissa käytetään tietorakennetta quad-edge (nelisivu?). Tässä toteutuksessa ei kuitenkaan tarvita sen kaikkia komponentteja ja funktioita, koska algoritmissa ei poiketa duaalin (Voronoin diagrammin) puolelle.
 
-Algoritmi jakaa pistejoukon rekursiivisesti aina kahteen kunnes päästään perustapauksiin, joissa pisteitä on 2 tai 3. Kun nämä on triangoloitu, aletaan puolikkaita pistejoukkoja yhdistämään, jolloin joudutaan poistamaan sivuja vasemmasta ja oikeasta puolikkaasta ja lisäämään sivuja vasemman ja oikean puolikaan välille.
+Algoritmi jakaa pistejoukon rekursiivisesti aina kahteen kunnes päästään perustapauksiin, joissa pisteitä on 2 tai 3. Kun nämä on kolmioitu, aletaan puolikkaita yhdistämään, jolloin joudutaan poistamaan sivuja vasemmasta ja oikeasta puolikkaasta ja lisäämään sivuja vasemman ja oikean puolikaan välille.
 
 Päätökset tehdään `InCircle` (onko piste kolmen pisteen muodostaman ympyrän sisällä tai kehällä) ja CCW (muodostaako kolme pistettä suunnatun kolmion vastapäivään) -testien avulla. Algoritmi antaa kaksi sivua, jotka ovat uloimpien pisteiden vasemmanpuoleisimmasta pisteestä vastapäivään lähtevä sivu ja oikeanpuoleisimmasta pisteestä myötäpäivään lähtevä sivu.
 
