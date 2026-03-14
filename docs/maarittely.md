@@ -34,13 +34,13 @@ Aion laskea Delaunayn triangulaation toteuttamalla Guibasin ja Stolfin hajota ja
 
 [Leonidas Guibas and Jorge Stolfi. 1985. Primitives for the manipulation of general subdivisions and the computation of Voronoi. ACM Trans. Graph. 4, 2 (April 1985), 74–123.](https://dl.acm.org/doi/10.1145/282918.282923)
 
-Artikkelissa käytetään tietorakennetta quad-edge (nelisivu?). Tässä toteutuksessa ei kuitenkaan tarvita sen kaikkia komponentteja ja funktioita, koska algoritmissa ei poiketa duaalin (Voronoin diagrammin) puolelle.
+Artikkelissa käytetään tietorakennetta quad-edge (nelisivu?).
 
 Algoritmi jakaa pistejoukon rekursiivisesti aina kahteen kunnes päästään perustapauksiin, joissa pisteitä on 2 tai 3. Kun nämä on kolmioitu, aletaan puolikkaita yhdistämään, jolloin joudutaan poistamaan sivuja vasemmasta ja oikeasta puolikkaasta ja lisäämään sivuja vasemman ja oikean puolikaan välille.
 
 Päätökset tehdään `InCircle` (onko piste kolmen pisteen muodostaman ympyrän sisällä tai kehällä) ja `CCW` (muodostaako kolme pistettä suunnatun kolmion vastapäivään) -testien avulla. Algoritmi antaa kaksi sivua, jotka ovat uloimpien pisteiden vasemmanpuoleisimmasta pisteestä vastapäivään lähtevä sivu ja oikeanpuoleisimmasta pisteestä myötäpäivään lähtevä sivu.
 
-Lisäksi aion käyttää [tätä Ian Henryn blogipostausta](https://ianthehenry.com/posts/delaunay/), joka käsittelee Guibasin ja Stolfin algoritmeissa käytettävää tietorakennetta (yksinkertaisempaa versiota) ja toteuttaa Delaunayn triangulaation artikkelissa esitetyllä toisella iteratiivisella algoritmilla.
+Lisäksi aion käyttää [tätä Ian Henryn blogipostausta](https://ianthehenry.com/posts/delaunay/), joka käsittelee Guibasin ja Stolfin algoritmeissa käytettävää tietorakennetta ja toteuttaa Delaunayn triangulaation artikkelissa esitetyllä toisella iteratiivisella algoritmilla.
 
 Ohjelman muista vaiheista otin neuvoa [tästä blogipostauksesta](https://vazgriz.com/119/procedurally-generated-dungeons/).
 
