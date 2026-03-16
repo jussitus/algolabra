@@ -2,9 +2,10 @@ import random
 from math import floor, sqrt
 
 
-# bad
+# bad, fix/remove
 def points_spread(n: int, max_x: int, max_y: int, seed: int):
-    random.seed(seed)
+    if seed != -1:
+        random.seed(seed)
     s = set()
     base = floor(sqrt(n))
     gap_x = max_x // base
@@ -20,6 +21,7 @@ def points_spread(n: int, max_x: int, max_y: int, seed: int):
 
 
 def points_random(n: int, max_x: int, max_y: int, seed: int):
-    random.seed(seed)
+    if seed != -1:
+        random.seed(seed)
     s = [(random.randint(0, max_x), random.randint(0, max_y)) for _ in range(n)]
     return sorted(s)

@@ -1,9 +1,26 @@
-from edge import Edge, makeQuadEdge, splice, connect, deleteEdge
-from condition import ccw, inCircle, rightOf, leftOf, valid
+from edge import (
+    Edge,
+    makeQuadEdge,
+    splice,
+    connect,
+    deleteEdge,
+    circumcircle,
+    triangle_ccw,
+    triangle_cw,
+    hull,
+)
+from condition import (
+    ccw,
+    inCircle,
+    rightOf,
+    leftOf,
+    valid,
+)
+from search import bfs
 
 
 def delaunay(s) -> (Edge, Edge):
-    # s must be sorted in increasing x direction
+    s = sorted(s)
     if len(s) < 2:
         raise ValueError(f"len(s)={len(s)} is less than 2")
     if len(s) == 2:
@@ -67,3 +84,21 @@ def delaunay(s) -> (Edge, Edge):
             else:
                 basel = connect(basel.sym, lcand.sym)
     return (ldo, rdo)
+
+
+def voronoi(hull_edge: Edge, edges=None) -> Edge:
+    if edges == None:
+        edges = bfs(hull_edge)
+    outer = hull(hull_edge)
+    for e_first in edges:
+        triangle = triangle_ccw(e_first)
+        for e in triangle:
+            if ccw(e.org, e.dest, e.lnext.dest):
+                dest, _ = circumcircle(e)
+                if e not in outer:
+                    org, _ = circumcircle(e.sym)
+                else:
+                    org = None
+                e.rot.dest = dest
+                e.rot.org = org
+    return e.rot
