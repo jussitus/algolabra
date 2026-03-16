@@ -17,11 +17,25 @@ def points_spread(n: int, max_x: int, max_y: int, seed: int):
             x = i * gap_x + random.randint(0, offset_x)
             y = k * gap_y + random.randint(0, offset_y)
             s.add((x, y))
-    return sorted(list(s))
+    return list(s)
 
 
 def points_random(n: int, max_x: int, max_y: int, seed: int):
     if seed != -1:
         random.seed(seed)
     s = [(random.randint(0, max_x), random.randint(0, max_y)) for _ in range(n)]
+    return s
+
+
+def points_circular(n: int, max_x: int, max_y: int, seed: int):
+    if seed != -1:
+        random.seed(seed)
+    s = []
+    mid_x = max_x // 2
+    mid_y = max_y // 2
+    while len(s) < n:
+        x = random.randint(0, max_x)
+        y = random.randint(0, max_y)
+        if sqrt((x - mid_x) ** 2 + (y - mid_y) ** 2) <= max(mid_x, mid_y):
+            s.append((x, y))
     return sorted(s)

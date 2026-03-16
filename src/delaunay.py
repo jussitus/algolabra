@@ -20,7 +20,6 @@ from search import bfs
 
 
 def delaunay(s) -> (Edge, Edge):
-    s = sorted(s)
     if len(s) < 2:
         raise ValueError(f"len(s)={len(s)} is less than 2")
     if len(s) == 2:
