@@ -20,6 +20,7 @@ from search import bfs
 
 
 def delaunay(s) -> (Edge, Edge):
+    s = sorted(s)
     if len(s) < 2:
         raise ValueError(f"len(s)={len(s)} is less than 2")
     if len(s) == 2:
@@ -42,7 +43,6 @@ def delaunay(s) -> (Edge, Edge):
         mid = len(s) // 2
         (ldo, ldi) = delaunay(s[:mid])
         (rdi, rdo) = delaunay(s[mid:])
-
         while True:
             if leftOf(rdi.org, ldi):
                 ldi = ldi.lnext
@@ -82,7 +82,7 @@ def delaunay(s) -> (Edge, Edge):
                 basel = connect(rcand, basel.sym)
             else:
                 basel = connect(basel.sym, lcand.sym)
-    return (ldo, rdo)
+        return (ldo, rdo)
 
 
 def voronoi(hull_edge: Edge, edges=None) -> Edge:

@@ -47,7 +47,7 @@ class Edge:
     def dnext(self):
         return self.sym.onext.sym
 
-    @property
+    @dnext.setter
     def dnext(self, value):
         self.sym.onext.sym = value
 
@@ -111,8 +111,6 @@ def splice(a, b):
 
 def connect(a, b) -> Edge:
     e = makeQuadEdge(a.dest, b.org)
-    e.org = a.dest
-    e.dest = b.org
     splice(e, a.lnext)
     splice(e.sym, b)
     return e

@@ -15,18 +15,13 @@ def bfs(e: Edge) -> list:
 
     while len(q) > 0:
         e = q.popleft()
-        for i in [e, e.lnext, e.lnext.lnext]:
-            first = i
-            current = i.onext
-            ring = [i]
-            while True:
-                if first == current:
-                    break
-                ring.append(current)
-                current = current.onext
-            for k in ring:
-                if checkVisited(k, visited):
-                    continue
-                q.append(k)
-                mark(k, visited)
+        current = e.lnext
+        ring = [e, e.sym]
+        if not checkVisited(current, visited):
+            ring.append(current)
+        for k in ring:
+            if checkVisited(k, visited):
+                continue
+            mark(e, visited)
+            q.append(k)
     return list(visited)
