@@ -3,7 +3,6 @@ from edge import circumcircles
 import random
 import networkx as nx
 import matplotlib.pyplot as plt
-from search import bfs
 from point_generation import points_random, points_circular
 import matplotlib.pyplot as plt
 from condition import ccw

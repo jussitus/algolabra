@@ -15,7 +15,6 @@ from condition import (
     left_of,
     valid,
 )
-from search import bfs
 
 
 class Delaunay:
