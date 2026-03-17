@@ -84,7 +84,7 @@ class Delaunay:
                     org, _ = circumcircle(e.sym)
                 else:
                     org = None
-                e.rot.dest = dest
+                e.rot.sym.org = dest
                 e.rot.org = org
 
     def run(self):

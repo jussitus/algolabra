@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from condition import ccw
 from time import time
 
-s = points_circular(100, 100, 100, 2)
+s = points_circular(4, 4, 4, -1)
 print("Generated points.")
 print(f"len(s) = {len(s)}")
 # s = [(-1, 2), (0, 3), (2, 0), (4, 5)]
@@ -19,13 +19,7 @@ took = time() - start
 print(f"Triangulated, took: {took}")
 print(f"edges = {len(d.edges)}")
 print(f"vertices= {len(d.vertices)}")
-# start = time()
-# edges = bfs(l)
-# took = time() - start
-# print(f"Traversed, took: {took}")
-# v = voronoi(l, edges)
-# edges_voronoi = bfs(v)
-# edges_v = []
+print(f"l: {l.onext}")
 # for e in edges_voronoi:
 #     if e.org is not None and e.dest is not None:
 #         edges_v.append(e)

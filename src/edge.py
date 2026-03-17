@@ -5,76 +5,40 @@ from condition import ccw
 class Edge:
     """Delaunay triangulaation peruspalikka, placeholder"""
 
+    __slots__ = ["org", "sym", "onext", "rot", "tor", "dual", "data"]
+
     def __init__(self):
-        self.data = None
+        self.data = {}
         self.org = None
-        self.onext: Edge = None
-        self.rot: Edge = None
         self.dual = False
-
-    @property
-    def sym(self):
-        return self.rot.rot
-
-    @sym.setter
-    def sym(self, value):
-        self.rot.rot = value
-
-    @property
-    def tor(self):
-        return self.rot.rot.rot
-
-    @tor.setter
-    def tor(self, value):
-        self.rot.rot.rot = value
+        self.onext: Edge = self
+        self.sym: Edge = None
+        self.rot: Edge = None
+        self.tor: Edge = None
 
     @property
     def lnext(self):
         return self.tor.onext.rot
 
-    @lnext.setter
-    def lnext(self, value):
-        self.tor.onext.rot = value
-
     @property
     def rnext(self):
         return self.rot.onext.tor
-
-    @rnext.setter
-    def rnext(self, value):
-        self.rot.onext.tor = value
 
     @property
     def dnext(self):
         return self.sym.onext.sym
 
-    @dnext.setter
-    def dnext(self, value):
-        self.sym.onext.sym = value
-
     @property
     def dest(self):
         return self.sym.org
-
-    @dest.setter
-    def dest(self, value):
-        self.sym.org = value
 
     @property
     def oprev(self):
         return self.rot.onext.rot
 
-    @oprev.setter
-    def oprev(self, value):
-        self.rot.onext.rot = value
-
     @property
     def rprev(self):
         return self.sym.onext
-
-    @rprev.setter
-    def rprev(self, value):
-        self.sym.onext = value
 
     def __str__(self):
         return "{" + f"org: {self.org}, dest: {self.dest}, data: {self.data}" + "}"
@@ -89,18 +53,32 @@ def make_quad_edge(org, dest):
     e.org = org
     e_sym.org = dest
 
-    e.rot = e_rot
-    e_sym.rot = e_tor
-    e_rot.rot = e_sym
-    e_tor.rot = e
-
     e.onext = e
     e_sym.onext = e_sym
     e_rot.onext = e_tor
     e_tor.onext = e_rot
 
+    e.sym = e_sym
+    e_sym.sym = e
+    e_rot.sym = e_tor
+    e_tor.sym = e_rot
+
+    e.rot = e_rot
+    e_sym.rot = e_tor
+    e_rot.rot = e_sym
+    e_tor.rot = e
+
+    e.tor = e_tor
+    e_sym.tor = e_rot
+    e_rot.tor = e
+    e_tor.tor = e_sym
+
     e_rot.dual = True
     e_tor.dual = True
+
+    length = sqrt((e.org[0] - e.sym.org[0]) ** 2 + (e.dest[1] - e.sym.dest[1]) ** 2)
+    e.data["length"] = length
+    e.sym.data["length"] = length
 
     return e
 
