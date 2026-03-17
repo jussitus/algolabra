@@ -9,24 +9,17 @@ from condition import ccw
 from time import time
 from math import log
 
-for n in [1000, 10000, 100000, 1000000]:
-    s = points_circular(n, 10000, 10000, 42)
-    start = time()
-    d = Delaunay(s).run_delaunay()
-    end = time()
-    total = end - start
-    ratio = total / (n * log(n))
-    print(f"n = {n}, ratio = {ratio}, time = {total}")
-
-
-exit()
+n = 100000
+s = points_circular(n, n, n, 42)
 start = time()
 d = Delaunay(s)
-l = d.run_delaunay()
-took = time() - start
-print(f"Triangulated, took: {took:.4f}")
+d.run_delaunay()
+end = time()
+total = end - start
+ratio = total / (n * log(n))
+print(f"n = {n}, ratio = {ratio}, time = {total}")
 
-exit()
+
 start = time()
 d.run_voronoi()
 took = time() - start
@@ -35,7 +28,7 @@ print(f"Calculated Voronoi, took: {took:.4f}")
 
 print(f"edges = {len(d.edges)}")
 print(f"vertices= {len(d.vertices)}")
-exit()
+print(f"hull len = {len(d.hull)}")
 D = nx.Graph()
 for t in d.triangles:
     for e in t:

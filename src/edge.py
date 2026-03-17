@@ -19,15 +19,14 @@ class Edge:
 
     def __init__(self):
         self.org = None
-        self.onext: Edge = self
-        self.sym: Edge = None
-        self.rot: Edge = None
-        self.tor: Edge = None
-
-        self.data = None
+        self.sym = None
+        self.onext = self
+        self.rot = None
+        self.tor = None
         self.dual = False
-        self._length = None
+        self.data = None
         self.radius = None
+        self._length = None
 
     @property
     def lnext(self):

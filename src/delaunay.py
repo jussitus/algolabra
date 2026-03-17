@@ -19,7 +19,7 @@ from condition import (
 
 class Delaunay:
     def __init__(self, vertices):
-        self._vertices = vertices
+        self._vertices = sorted(vertices)
         self._edges = []
         self._left = None
         self._right = None
@@ -144,10 +144,7 @@ def _delaunay(s, edges, bad_edges) -> (Edge, Edge):
             while incircle(basel.dest, basel.org, lcand.dest, lcand.onext.dest):
                 t = lcand.onext
                 delete_quad_edge(lcand)
-                bad_edges.append(lcand)
-                bad_edges.append(lcand.sym)
-                bad_edges.append(lcand.rot)
-                bad_edges.append(lcand.tor)
+                bad_edges.extend([lcand, lcand.sym, lcand.rot, lcand.tor])
                 lcand = t
         rcand = basel.oprev
 
@@ -155,10 +152,7 @@ def _delaunay(s, edges, bad_edges) -> (Edge, Edge):
             while incircle(basel.dest, basel.org, rcand.dest, rcand.oprev.dest):
                 t = rcand.oprev
                 delete_quad_edge(rcand)
-                bad_edges.append(rcand)
-                bad_edges.append(rcand.sym)
-                bad_edges.append(rcand.rot)
-                bad_edges.append(rcand.tor)
+                bad_edges.extend([rcand, rcand.sym, rcand.rot, rcand.tor])
                 rcand = t
 
         if not valid(lcand, basel) and not valid(rcand, basel):
