@@ -10,7 +10,7 @@ from time import time
 from math import log
 
 n = 100000
-s = points_circular(n, n, n, 42)
+s = points_circular(n, n, n, -1)
 start = time()
 d = Delaunay(s)
 d.run_delaunay()

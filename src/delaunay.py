@@ -122,7 +122,6 @@ def _delaunay(s, edges, bad_edges) -> (Edge, Edge):
     mid = len(s) // 2
     (ldo, ldi, lbad_edges) = _delaunay(s[:mid], edges, bad_edges)
     (rdi, rdo, rbad_edges) = _delaunay(s[mid:], edges, bad_edges)
-    bad_edges = bad_edges + lbad_edges + rbad_edges
     while True:
         if left_of(rdi.org, ldi):
             ldi = ldi.lnext
