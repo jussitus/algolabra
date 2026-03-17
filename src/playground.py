@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from condition import ccw
 from time import time
 
-s = points_circular(20000, 25000, 25000, 2)
+s = points_circular(100, 100, 100, 2)
 print("Generated points.")
 print(f"len(s) = {len(s)}")
 # s = [(-1, 2), (0, 3), (2, 0), (4, 5)]
@@ -19,7 +19,6 @@ took = time() - start
 print(f"Triangulated, took: {took}")
 print(f"edges = {len(d.edges)}")
 print(f"vertices= {len(d.vertices)}")
-exit()
 # start = time()
 # edges = bfs(l)
 # took = time() - start
@@ -55,13 +54,13 @@ nx.draw(
 #     node_size=10,
 # )
 
-V = nx.Graph()
-for e in d.edges:
-    if e.dual and e.org is not None and e.dest is not None:
-        a = e.org
-        b = e.dest
-        V.add_edge(a, b)
-pos_v = {node: node for node in V.nodes()}
+# V = nx.Graph()
+# for e in d.edges:
+#     if e.dual and e.org is not None and e.dest is not None:
+#         a = e.org
+#         b = e.dest
+#         V.add_edge(a, b)
+# pos_v = {node: node for node in V.nodes()}
 # nx.draw(V, pos_v, with_labels=False, edge_color="red", node_color="red", node_size=10)
 
 #

@@ -20,7 +20,6 @@ _shewchuk.orient2d.restype = ctypes.c_double
 
 
 def incircle(a, b, c, d):
-    global _shewchuk
     array_type = ctypes.c_double * 2
     res = _shewchuk.incircle(
         array_type(*a), array_type(*b), array_type(*c), array_type(*d)
@@ -31,7 +30,6 @@ def incircle(a, b, c, d):
 
 
 def ccw(a, b, c):
-    global _shewchuk
     array_type = ctypes.c_double * 2
     res = _shewchuk.orient2d(array_type(*a), array_type(*b), array_type(*c))
     return res > 0

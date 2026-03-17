@@ -1,5 +1,5 @@
 import random
-from math import floor, sqrt
+from math import sqrt
 
 
 def points_random(n: int, max_x: int, max_y: int, seed: int):

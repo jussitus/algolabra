@@ -1,12 +1,11 @@
 from edge import (
     Edge,
-    makeQuadEdge,
+    make_quad_edge,
     splice,
     connect,
-    deleteEdge,
+    delete_quad_edge,
     circumcircle,
     triangle_ccw,
-    triangle_cw,
 )
 from condition import (
     ccw,
@@ -18,7 +17,7 @@ from condition import (
 
 
 class Delaunay:
-    def __init__(self, vertices=[]):
+    def __init__(self, vertices):
         self._vertices = vertices
         self._edges = []
         self._left = None
@@ -98,13 +97,13 @@ def _delaunay(s, edges, bad_edges) -> (Edge, Edge):
     if len(s) < 2:
         raise ValueError(f"len(s)={len(s)} is less than 2")
     if len(s) == 2:
-        a = makeQuadEdge(s[0], s[1])
+        a = make_quad_edge(s[0], s[1])
         edges.extend([a, a.sym, a.rot, a.tor])
         return (a, a.sym, bad_edges)
     elif len(s) == 3:
-        a = makeQuadEdge(s[0], s[1])
+        a = make_quad_edge(s[0], s[1])
         edges.extend([a, a.sym, a.rot, a.tor])
-        b = makeQuadEdge(s[1], s[2])
+        b = make_quad_edge(s[1], s[2])
         edges.extend([b, b.sym, b.rot, b.tor])
         splice(a.sym, b)
         if ccw(s[0], s[1], s[2]):
@@ -143,7 +142,7 @@ def _delaunay(s, edges, bad_edges) -> (Edge, Edge):
             if valid(lcand, basel):
                 while incircle(basel.dest, basel.org, lcand.dest, lcand.onext.dest):
                     t = lcand.onext
-                    deleteEdge(lcand)
+                    delete_quad_edge(lcand)
                     bad_edges.append(lcand)
                     bad_edges.append(lcand.sym)
                     bad_edges.append(lcand.rot)
@@ -154,7 +153,7 @@ def _delaunay(s, edges, bad_edges) -> (Edge, Edge):
             if valid(rcand, basel):
                 while incircle(basel.dest, basel.org, rcand.dest, rcand.oprev.dest):
                     t = rcand.oprev
-                    deleteEdge(rcand)
+                    delete_quad_edge(rcand)
                     bad_edges.append(rcand)
                     bad_edges.append(rcand.sym)
                     bad_edges.append(rcand.rot)

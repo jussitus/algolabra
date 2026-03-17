@@ -80,27 +80,27 @@ class Edge:
         return "{" + f"org: {self.org}, dest: {self.dest}, data: {self.data}" + "}"
 
 
-def makeQuadEdge(org, dest):
+def make_quad_edge(org, dest):
     e = Edge()
-    eSym = Edge()
-    eRot = Edge()
-    eTor = Edge()
+    e_sym = Edge()
+    e_rot = Edge()
+    e_tor = Edge()
 
     e.org = org
-    eSym.org = dest
+    e_sym.org = dest
 
-    e.rot = eRot
-    eSym.rot = eTor
-    eRot.rot = eSym
-    eTor.rot = e
+    e.rot = e_rot
+    e_sym.rot = e_tor
+    e_rot.rot = e_sym
+    e_tor.rot = e
 
     e.onext = e
-    eSym.onext = eSym
-    eRot.onext = eTor
-    eTor.onext = eRot
+    e_sym.onext = e_sym
+    e_rot.onext = e_tor
+    e_tor.onext = e_rot
 
-    eRot.dual = True
-    eTor.dual = True
+    e_rot.dual = True
+    e_tor.dual = True
 
     return e
 
@@ -114,13 +114,13 @@ def splice(a, b):
 
 
 def connect(a, b) -> Edge:
-    e = makeQuadEdge(a.dest, b.org)
+    e = make_quad_edge(a.dest, b.org)
     splice(e, a.lnext)
     splice(e.sym, b)
     return e
 
 
-def deleteEdge(e):
+def delete_quad_edge(e):
     splice(e, e.oprev)
     splice(e.sym, e.sym.oprev)
 
@@ -155,8 +155,8 @@ def circumcircle(e: Edge):
 
 
 def circumcircles(edges: list[Edge]):
-    circumcircles = set()
+    ccs = set()
     for e in edges:
         if ccw(e.org, e.dest, e.lnext.dest):
-            circumcircles.add(circumcircle(e))
-    return circumcircles
+            ccs.add(circumcircle(e))
+    return ccs
