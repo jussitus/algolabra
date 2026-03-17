@@ -7,22 +7,35 @@ from point_generation import points_random, points_circular
 import matplotlib.pyplot as plt
 from condition import ccw
 from time import time
+from math import log
 
-s = points_circular(4, 4, 4, -1)
-print("Generated points.")
-print(f"len(s) = {len(s)}")
-# s = [(-1, 2), (0, 3), (2, 0), (4, 5)]
+for n in [1000, 10000, 100000, 1000000]:
+    s = points_circular(n, 10000, 10000, 42)
+    start = time()
+    d = Delaunay(s).run_delaunay()
+    end = time()
+    total = end - start
+    ratio = total / (n * log(n))
+    print(f"n = {n}, ratio = {ratio}, time = {total}")
+
+
+exit()
 start = time()
 d = Delaunay(s)
-l = d.run()
+l = d.run_delaunay()
 took = time() - start
-print(f"Triangulated, took: {took}")
+print(f"Triangulated, took: {took:.4f}")
+
+exit()
+start = time()
+d.run_voronoi()
+took = time() - start
+print(f"Calculated Voronoi, took: {took:.4f}")
+
+
 print(f"edges = {len(d.edges)}")
 print(f"vertices= {len(d.vertices)}")
-print(f"l: {l.onext}")
-# for e in edges_voronoi:
-#     if e.org is not None and e.dest is not None:
-#         edges_v.append(e)
+exit()
 D = nx.Graph()
 for t in d.triangles:
     for e in t:

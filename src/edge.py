@@ -5,16 +5,29 @@ from condition import ccw
 class Edge:
     """Delaunay triangulaation peruspalikka, placeholder"""
 
-    __slots__ = ["org", "sym", "onext", "rot", "tor", "dual", "data"]
+    __slots__ = [
+        "org",
+        "sym",
+        "onext",
+        "rot",
+        "tor",
+        "dual",
+        "data",
+        "radius",
+        "_length",
+    ]
 
     def __init__(self):
-        self.data = {}
         self.org = None
-        self.dual = False
         self.onext: Edge = self
         self.sym: Edge = None
         self.rot: Edge = None
         self.tor: Edge = None
+
+        self.data = None
+        self.dual = False
+        self._length = None
+        self.radius = None
 
     @property
     def lnext(self):
@@ -40,8 +53,20 @@ class Edge:
     def rprev(self):
         return self.sym.onext
 
+    @property
+    def length(self):
+        if self._length is None:
+            if self.org is not None and self.dest is not None:
+                self._length = sqrt(
+                    (self.org[0] - self.sym.org[0]) ** 2
+                    + (self.dest[1] - self.sym.dest[1]) ** 2
+                )
+            else:
+                return 0  # infinite voronoi edge
+        return self._length
+
     def __str__(self):
-        return "{" + f"org: {self.org}, dest: {self.dest}, data: {self.data}" + "}"
+        return "{" + f"org: {self.org}, dest: {self.dest}, data: {self.radius}" + "}"
 
 
 def make_quad_edge(org, dest):
@@ -75,10 +100,6 @@ def make_quad_edge(org, dest):
 
     e_rot.dual = True
     e_tor.dual = True
-
-    length = sqrt((e.org[0] - e.sym.org[0]) ** 2 + (e.dest[1] - e.sym.dest[1]) ** 2)
-    e.data["length"] = length
-    e.sym.data["length"] = length
 
     return e
 

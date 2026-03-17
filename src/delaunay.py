@@ -1,3 +1,4 @@
+from math import sqrt
 from edge import (
     Edge,
     make_quad_edge,
@@ -28,10 +29,6 @@ class Delaunay:
     @property
     def vertices(self):
         return self._vertices
-
-    @vertices.setter
-    def vertices(self, vertices):
-        self._vertices = vertices
 
     @property
     def edges(self):
@@ -79,13 +76,18 @@ class Delaunay:
     def run_voronoi(self):
         for t in self.triangles:
             for e in t:
-                dest, _ = circumcircle(e)
+                vo = e.rot
+
                 if e not in self.hull:
-                    org, _ = circumcircle(e.sym)
+                    org, r_sym = circumcircle(e.sym)
+                    vo.sym.radius = r_sym
                 else:
-                    org = None
-                e.rot.sym.org = dest
-                e.rot.org = org
+                    vo.org = None
+
+                vo.sym.org, r = circumcircle(e)
+                vo.radius = r
+                vo.sym.radius = r
+        return self.left.rot
 
     def run(self):
         self.run_delaunay()
@@ -100,7 +102,7 @@ def _delaunay(s, edges, bad_edges) -> (Edge, Edge):
         a = make_quad_edge(s[0], s[1])
         edges.extend([a, a.sym, a.rot, a.tor])
         return (a, a.sym, bad_edges)
-    elif len(s) == 3:
+    if len(s) == 3:
         a = make_quad_edge(s[0], s[1])
         edges.extend([a, a.sym, a.rot, a.tor])
         b = make_quad_edge(s[1], s[2])
@@ -110,66 +112,65 @@ def _delaunay(s, edges, bad_edges) -> (Edge, Edge):
             c = connect(b, a)
             edges.extend([c, c.sym, c.rot, c.tor])
             return (a, b.sym, bad_edges)
-        elif ccw(s[0], s[2], s[1]):
+        if ccw(s[0], s[2], s[1]):
             c = connect(b, a)
             edges.extend([c, c.sym, c.rot, c.tor])
             return (c.sym, c, bad_edges)
+
+        return (a, b.sym, bad_edges)
+
+    mid = len(s) // 2
+    (ldo, ldi, lbad_edges) = _delaunay(s[:mid], edges, bad_edges)
+    (rdi, rdo, rbad_edges) = _delaunay(s[mid:], edges, bad_edges)
+    bad_edges = bad_edges + lbad_edges + rbad_edges
+    while True:
+        if left_of(rdi.org, ldi):
+            ldi = ldi.lnext
+        elif right_of(ldi.org, rdi):
+            rdi = rdi.rprev
         else:
-            return (a, b.sym, bad_edges)
+            break
+    basel = connect(rdi.sym, ldi)
+    edges.extend([basel, basel.sym, basel.rot, basel.tor])
+    if ldi.org == ldo.org:
+        ldo = basel.sym
+    if rdi.org == rdo.org:
+        rdo = basel
 
-    else:
-        mid = len(s) // 2
-        (ldo, ldi, lbad_edges) = _delaunay(s[:mid], edges, bad_edges)
-        (rdi, rdo, rbad_edges) = _delaunay(s[mid:], edges, bad_edges)
-        bad_edges = bad_edges + lbad_edges + rbad_edges
-        while True:
-            if left_of(rdi.org, ldi):
-                ldi = ldi.lnext
-            elif right_of(ldi.org, rdi):
-                rdi = rdi.rprev
-            else:
-                break
-        basel = connect(rdi.sym, ldi)
-        edges.extend([basel, basel.sym, basel.rot, basel.tor])
-        if ldi.org == ldo.org:
-            ldo = basel.sym
-        if rdi.org == rdo.org:
-            rdo = basel
+    # merge loop
+    while True:
+        lcand = basel.sym.onext
+        if valid(lcand, basel):
+            while incircle(basel.dest, basel.org, lcand.dest, lcand.onext.dest):
+                t = lcand.onext
+                delete_quad_edge(lcand)
+                bad_edges.append(lcand)
+                bad_edges.append(lcand.sym)
+                bad_edges.append(lcand.rot)
+                bad_edges.append(lcand.tor)
+                lcand = t
+        rcand = basel.oprev
 
-        # merge loop
-        while True:
-            lcand = basel.sym.onext
-            if valid(lcand, basel):
-                while incircle(basel.dest, basel.org, lcand.dest, lcand.onext.dest):
-                    t = lcand.onext
-                    delete_quad_edge(lcand)
-                    bad_edges.append(lcand)
-                    bad_edges.append(lcand.sym)
-                    bad_edges.append(lcand.rot)
-                    bad_edges.append(lcand.tor)
-                    lcand = t
-            rcand = basel.oprev
+        if valid(rcand, basel):
+            while incircle(basel.dest, basel.org, rcand.dest, rcand.oprev.dest):
+                t = rcand.oprev
+                delete_quad_edge(rcand)
+                bad_edges.append(rcand)
+                bad_edges.append(rcand.sym)
+                bad_edges.append(rcand.rot)
+                bad_edges.append(rcand.tor)
+                rcand = t
 
-            if valid(rcand, basel):
-                while incircle(basel.dest, basel.org, rcand.dest, rcand.oprev.dest):
-                    t = rcand.oprev
-                    delete_quad_edge(rcand)
-                    bad_edges.append(rcand)
-                    bad_edges.append(rcand.sym)
-                    bad_edges.append(rcand.rot)
-                    bad_edges.append(rcand.tor)
-                    rcand = t
+        if not valid(lcand, basel) and not valid(rcand, basel):
+            break
 
-            if not valid(lcand, basel) and not valid(rcand, basel):
-                break
-
-            if not valid(lcand, basel) or (
-                valid(rcand, basel)
-                and incircle(lcand.dest, lcand.org, rcand.org, rcand.dest)
-            ):
-                basel = connect(rcand, basel.sym)
-                edges.extend([basel, basel.sym, basel.rot, basel.tor])
-            else:
-                basel = connect(basel.sym, lcand.sym)
-                edges.extend([basel, basel.sym, basel.rot, basel.tor])
-        return (ldo, rdo, bad_edges)
+        if not valid(lcand, basel) or (
+            valid(rcand, basel)
+            and incircle(lcand.dest, lcand.org, rcand.org, rcand.dest)
+        ):
+            basel = connect(rcand, basel.sym)
+            edges.extend([basel, basel.sym, basel.rot, basel.tor])
+        else:
+            basel = connect(basel.sym, lcand.sym)
+            edges.extend([basel, basel.sym, basel.rot, basel.tor])
+    return (ldo, rdo, bad_edges)
