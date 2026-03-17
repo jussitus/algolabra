@@ -1,33 +1,23 @@
-import numpy as np
+from shewchuk import incircle as incircle_c
+from shewchuk import ccw as ccw_c
 
 
 def ccw(a, b, c):
-    res = np.linalg.det([[a[0], a[1], 1], [b[0], b[1], 1], [c[0], c[1], 1]])
-    res = int(round(res))
-    return res > 0
+    return ccw_c(a, b, c)
 
 
-def inCircle(a, b, c, d):
-    res = np.linalg.det(
-        [
-            [a[0], a[1], (a[0]) ** 2 + (a[1]) ** 2, 1],
-            [b[0], b[1], (b[0]) ** 2 + (b[1]) ** 2, 1],
-            [c[0], c[1], (c[0]) ** 2 + (c[1]) ** 2, 1],
-            [d[0], d[1], (d[0]) ** 2 + (d[1]) ** 2, 1],
-        ]
-    )
-    res = int(round(res))
-    return res > 0
+def incircle(a, b, c, d):
+    return incircle_c(a, b, c, d)
 
 
-def rightOf(x, e):
+def right_of(x, e):
     return ccw(x, e.dest, e.org)
 
 
-def leftOf(x, e):
+def left_of(x, e):
     return ccw(x, e.org, e.dest)
 
 
 # e above basel?
 def valid(e, basel):
-    return ccw(e.dest, basel.dest, basel.org)
+    return ccw_c(e.dest, basel.dest, basel.org)

@@ -5,11 +5,12 @@ from condition import ccw
 class Edge:
     """Delaunay triangulaation peruspalikka, placeholder"""
 
-    def __init_(self):
+    def __init__(self):
         self.data = None
         self.org = None
         self.onext: Edge = None
         self.rot: Edge = None
+        self.dual = False
 
     @property
     def sym(self):
@@ -76,7 +77,7 @@ class Edge:
         self.sym.onext = value
 
     def __str__(self):
-        return "{" + f"org: {self.org}, dest: {self.dest}" + "}"
+        return "{" + f"org: {self.org}, dest: {self.dest}, data: {self.data}" + "}"
 
 
 def makeQuadEdge(org, dest):
@@ -97,6 +98,9 @@ def makeQuadEdge(org, dest):
     eSym.onext = eSym
     eRot.onext = eTor
     eTor.onext = eRot
+
+    eRot.dual = True
+    eTor.dual = True
 
     return e
 
@@ -156,13 +160,3 @@ def circumcircles(edges: list[Edge]):
         if ccw(e.org, e.dest, e.lnext.dest):
             circumcircles.add(circumcircle(e))
     return circumcircles
-
-
-def hull(e: Edge):
-    hull = [e]
-    first = e
-    current = e.rprev
-    while first != current:
-        hull.append(current)
-        current = current.rprev
-    return hull

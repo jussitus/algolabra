@@ -7,50 +7,130 @@ from edge import (
     circumcircle,
     triangle_ccw,
     triangle_cw,
-    hull,
 )
 from condition import (
     ccw,
-    inCircle,
-    rightOf,
-    leftOf,
+    incircle,
+    right_of,
+    left_of,
     valid,
 )
 from search import bfs
 
 
-def delaunay(s) -> (Edge, Edge):
-    s = sorted(s)
+class Delaunay:
+    def __init__(self, vertices=[]):
+        self._vertices = vertices
+        self._edges = []
+        self._left = None
+        self._right = None
+        self._triangles = []
+        self._hull = []
+
+    @property
+    def vertices(self):
+        return self._vertices
+
+    @vertices.setter
+    def vertices(self, vertices):
+        self._vertices = vertices
+
+    @property
+    def edges(self):
+        return self._edges
+
+    @property
+    def left(self):
+        return self._left
+
+    @property
+    def right(self):
+        return self._right
+
+    @property
+    def triangles(self):
+        if len(self._triangles) > 0 or len(self.edges) == 0:
+            return self._triangles
+        triangles = []
+        for e in self.edges:
+            if e.dual or e.sym in self.hull:
+                continue
+            if e.org[0] <= e.lnext.org[0] and e.org[0] <= e.lnext.lnext.org[0]:
+                triangles.append(triangle_ccw(e))
+        self._triangles = triangles
+        return self._triangles
+
+    @property
+    def hull(self):
+        if len(self._hull) > 0 or len(self.edges) == 0:
+            return self._hull
+        hull = [self.left]
+        first = self.left
+        current = first.rprev
+        while first != current:
+            hull.append(current)
+            current = current.rprev
+        self._hull = hull
+        return self._hull
+
+    def run_delaunay(self):
+        self._left, self._right = _delaunay(self._vertices, self._edges)
+        return self._left
+
+    def run_voronoi(self):
+        for t in self.triangles:
+            for e in t:
+                dest, _ = circumcircle(e)
+                if e not in self.hull:
+                    org, _ = circumcircle(e.sym)
+                else:
+                    org = None
+                e.rot.dest = dest
+                e.rot.org = org
+
+    def run(self):
+        self.run_delaunay()
+        self.run_voronoi()
+        return self.left
+
+
+def _delaunay(s, edges) -> (Edge, Edge):
     if len(s) < 2:
         raise ValueError(f"len(s)={len(s)} is less than 2")
     if len(s) == 2:
         a = makeQuadEdge(s[0], s[1])
+        edges.extend([a, a.sym, a.rot, a.tor])
         return (a, a.sym)
     elif len(s) == 3:
         a = makeQuadEdge(s[0], s[1])
+        edges.extend([a, a.sym, a.rot, a.tor])
         b = makeQuadEdge(s[1], s[2])
+        edges.extend([b, b.sym, b.rot, b.tor])
         splice(a.sym, b)
         if ccw(s[0], s[1], s[2]):
             c = connect(b, a)
+            edges.extend([c, c.sym, c.rot, c.tor])
             return (a, b.sym)
         elif ccw(s[0], s[2], s[1]):
             c = connect(b, a)
+            edges.extend([c, c.sym, c.rot, c.tor])
             return (c.sym, c)
         else:
             return (a, b.sym)
 
     else:
         mid = len(s) // 2
-        (ldo, ldi) = delaunay(s[:mid])
-        (rdi, rdo) = delaunay(s[mid:])
+        (ldo, ldi) = _delaunay(s[:mid], edges)
+        (rdi, rdo) = _delaunay(s[mid:], edges)
         while True:
-            if leftOf(rdi.org, ldi):
+            if left_of(rdi.org, ldi):
                 ldi = ldi.lnext
-            elif rightOf(ldi.org, rdi):
+            elif right_of(ldi.org, rdi):
                 rdi = rdi.rprev
             else:
                 break
         basel = connect(rdi.sym, ldi)
+        edges.extend([basel, basel.sym, basel.rot, basel.tor])
         if ldi.org == ldo.org:
             ldo = basel.sym
         if rdi.org == rdo.org:
@@ -60,16 +140,24 @@ def delaunay(s) -> (Edge, Edge):
         while True:
             lcand = basel.sym.onext
             if valid(lcand, basel):
-                while inCircle(basel.dest, basel.org, lcand.dest, lcand.onext.dest):
+                while incircle(basel.dest, basel.org, lcand.dest, lcand.onext.dest):
                     t = lcand.onext
                     deleteEdge(lcand)
+                    edges.remove(lcand)
+                    edges.remove(lcand.sym)
+                    edges.remove(lcand.rot)
+                    edges.remove(lcand.tor)
                     lcand = t
             rcand = basel.oprev
 
             if valid(rcand, basel):
-                while inCircle(basel.dest, basel.org, rcand.dest, rcand.oprev.dest):
+                while incircle(basel.dest, basel.org, rcand.dest, rcand.oprev.dest):
                     t = rcand.oprev
                     deleteEdge(rcand)
+                    edges.remove(rcand)
+                    edges.remove(rcand.sym)
+                    edges.remove(rcand.rot)
+                    edges.remove(rcand.tor)
                     rcand = t
 
             if not valid(lcand, basel) and not valid(rcand, basel):
@@ -77,27 +165,11 @@ def delaunay(s) -> (Edge, Edge):
 
             if not valid(lcand, basel) or (
                 valid(rcand, basel)
-                and inCircle(lcand.dest, lcand.org, rcand.org, rcand.dest)
+                and incircle(lcand.dest, lcand.org, rcand.org, rcand.dest)
             ):
                 basel = connect(rcand, basel.sym)
+                edges.extend([basel, basel.sym, basel.rot, basel.tor])
             else:
                 basel = connect(basel.sym, lcand.sym)
+                edges.extend([basel, basel.sym, basel.rot, basel.tor])
         return (ldo, rdo)
-
-
-def voronoi(hull_edge: Edge, edges=None) -> Edge:
-    if edges == None:
-        edges = bfs(hull_edge)
-    outer = hull(hull_edge)
-    for e_first in edges:
-        triangle = triangle_ccw(e_first)
-        for e in triangle:
-            if ccw(e.org, e.dest, e.lnext.dest):
-                dest, _ = circumcircle(e)
-                if e not in outer:
-                    org, _ = circumcircle(e.sym)
-                else:
-                    org = None
-                e.rot.dest = dest
-                e.rot.org = org
-    return e.rot
