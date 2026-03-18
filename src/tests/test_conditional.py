@@ -11,7 +11,7 @@ def big(l):
 
 
 def small(l):
-    return [(x / 123456789, y / 123456789) for (x, y) in l]
+    return [(x / 1234567890123456789, y / 1234567890123456789) for (x, y) in l]
 
 
 def test_ccw_collinear_int():
