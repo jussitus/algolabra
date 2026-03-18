@@ -26,6 +26,7 @@ def incircle(a, b, c, d):
     )
     # if not ccw(a, b, c):
     #     return -res > 0
+    print(res)
     return res > 0
 
 
