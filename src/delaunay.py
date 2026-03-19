@@ -1,4 +1,5 @@
 from math import sqrt
+import heapq as hq
 from edge import (
     Edge,
     make_quad_edge,
@@ -25,6 +26,9 @@ class Delaunay:
         self._right = None
         self._triangles = []
         self._hull = []
+        self._delaunay = []
+        self._voronoi = []
+        self._mst = []
 
     @property
     def vertices(self):
@@ -68,10 +72,47 @@ class Delaunay:
         self._hull = hull
         return self._hull
 
+    @property
+    def delaunay(self):
+        return self._delaunay
+
+    @property
+    def voronoi(self):
+        return self._voronoi
+    
+    @property
+    def mst(self):
+        return self._mst
+
+    def run_prim(self):
+        visited = {}
+        mst = []
+        heap = []
+
+        first = self._delaunay[2]
+        hq.heappush(heap, first.sym)
+        visited[first.org] = True
+        current = first.onext
+        while first is not current:
+            hq.heappush(heap, current.sym)
+            current = current.onext
+        while len(heap) > 0:
+            first = hq.heappop(heap)
+            current = first.onext
+            while first is not current:
+                if not visited.get(current.dest, False):
+                    hq.heappush(heap, current.sym)
+                current = current.onext
+            if not visited.get(first.org, False):
+                mst.append(first)
+                visited[first.org] = True
+        self._mst = mst
+
+
+
     def run_delaunay(self):
         self._left, self._right, bad_edges = _delaunay(self._vertices, self._edges, [])
         self._edges = list(set(self.edges) - set(bad_edges))
-        return self._left
 
     def run_voronoi(self):
         for t in self.triangles:
@@ -82,20 +123,29 @@ class Delaunay:
                     org, r_sym = circumcircle(e.sym)
                     vo.sym.radius = r_sym
                 else:
-                    vo.org = None
+                    vo.org = (float("inf"), float("inf"))
 
                 vo.sym.org, r = circumcircle(e)
                 vo.radius = r
                 vo.sym.radius = r
-        return self.left.rot
 
     def run(self):
         self.run_delaunay()
         self.run_voronoi()
-        return self.left
 
+        # edges = []
+        # for e in self.edges:
+        #    if e.org[0] <= e.sym.org[0]:
+        #        if e not in edges and e.sym not in edges:
+        #            edges.append(e)
+        # self._edges = edges
+        for e in self.edges:
+            if not e.dual and e.org < e.dest:
+                hq.heappush(self._delaunay, e)
+                hq.heappush(self._voronoi, e.rot)
+        self.run_prim()
 
-def _delaunay(s, edges, bad_edges) -> (Edge, Edge):
+def _delaunay(s, edges, bad_edges):
     if len(s) < 2:
         raise ValueError(f"len(s)={len(s)} is less than 2")
     if len(s) == 2:

@@ -61,11 +61,15 @@ class Edge:
                     + (self.dest[1] - self.sym.dest[1]) ** 2
                 )
             else:
-                return 0  # infinite voronoi edge
+                return float("-Infinity")  # infinite voronoi edge
         return self._length
 
     def __str__(self):
-        return "{" + f"org: {self.org}, dest: {self.dest}, data: {self.radius}" + "}"
+        string = f"org={self.org}, dest={self.dest}, length={self.length}"
+        return string
+
+    def __lt__(self, other):
+        return self.length < other.length
 
 
 def make_quad_edge(org, dest):

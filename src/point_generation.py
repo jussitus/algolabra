@@ -28,3 +28,17 @@ def points_circular(n: int, max_x: int, max_y: int, seed: int):
         if sqrt((x - mid_x) ** 2 + (y - mid_y) ** 2) <= max(mid_x, mid_y):
             s.add((x, y))
     return sorted(list(s))
+
+
+def points_circular_unit(n: int, max_x: int, max_y: int, seed: int):
+    if seed != -1:
+        random.seed(seed)
+    s = set()
+    mid_x = max_x // 2 / max_x
+    mid_y = max_y // 2 / max_y
+    while len(s) < n:
+        x = random.random()
+        y = random.random()
+        if sqrt((x - mid_x) ** 2 + (y - mid_y) ** 2) <= max(mid_x, mid_y):
+            s.add((x, y))
+    return sorted(list(s))
