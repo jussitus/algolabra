@@ -8,12 +8,20 @@ import matplotlib.pyplot as plt
 from condition import ccw
 from time import time
 from math import log
+from room_generation import Labyrinth
 
-n = 1000
+
+n = 10000
+lab = Labyrinth(n)
+exit()
+
+
+n = 100000
 s = points_circular(n, n, n, 1)
 start = time()
 d = Delaunay(s)
 d.run()
+exit()
 end = time()
 total = end - start
 ratio = total / (n * log(n))
@@ -22,8 +30,8 @@ print(f"n = {n}, ratio = {ratio}, time = {total}")
 print(f"edges: {len(d.edges)}")
 print(f"vertices: {len(d.vertices)}")
 print(f"delaunay lenth: {len(d.delaunay)}")
-#for e in d.delaunay:
-    #print(f"{e.org} -> {e.dest}")
+# for e in d.delaunay:
+# print(f"{e.org} -> {e.dest}")
 # for e in d.delaunay:
 #     print(e)
 
@@ -42,10 +50,10 @@ for e in d.mst:
 print(f"mst length: {total}")
 D = nx.Graph()
 for e in d.mst:
-    #print(e)
+    # print(e)
     a = e.org
     b = e.dest
-    D.add_edge(a,b)
+    D.add_edge(a, b)
 # for t in d.triangles:
 #     for e in t:
 #         a = e.org
@@ -53,10 +61,10 @@ for e in d.mst:
 #         D.add_edge(a, b)
 D = nx.Graph()
 for e in d.mst:
-    #print(e)
+    # print(e)
     a = e.org
     b = e.dest
-    D.add_edge(a,b)
+    D.add_edge(a, b)
 # for t in d.triangles:
 #     for e in t:
 #         a = e.org
@@ -75,7 +83,7 @@ nx.draw(
 )
 D_v = nx.Graph()
 for e in d.delaunay:
-    #print(e)
+    # print(e)
     a = e.org
     b = e.dest
     D_v.add_node(a)

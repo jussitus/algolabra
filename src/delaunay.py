@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, log
 import heapq as hq
 from edge import (
     Edge,
@@ -16,6 +16,7 @@ from condition import (
     left_of,
     valid,
 )
+from time import time
 
 
 class Delaunay:
@@ -79,12 +80,13 @@ class Delaunay:
     @property
     def voronoi(self):
         return self._voronoi
-    
+
     @property
     def mst(self):
         return self._mst
 
     def run_prim(self):
+        start = time()
         visited = {}
         mst = []
         heap = []
@@ -106,9 +108,13 @@ class Delaunay:
             if not visited.get(first.org, False):
                 mst.append(first)
                 visited[first.org] = True
+        end = time()
+        total = end - start
+        n = len(self._vertices)
+        ratio = total / (n * log(n))
+        print(f"PRIM: n = {n}, ratio = {ratio}, time = {total}")
+        print
         self._mst = mst
-
-
 
     def run_delaunay(self):
         self._left, self._right, bad_edges = _delaunay(self._vertices, self._edges, [])
@@ -133,17 +139,13 @@ class Delaunay:
         self.run_delaunay()
         self.run_voronoi()
 
-        # edges = []
-        # for e in self.edges:
-        #    if e.org[0] <= e.sym.org[0]:
-        #        if e not in edges and e.sym not in edges:
-        #            edges.append(e)
-        # self._edges = edges
         for e in self.edges:
             if not e.dual and e.org < e.dest:
-                hq.heappush(self._delaunay, e)
-                hq.heappush(self._voronoi, e.rot)
+                self._delaunay.append(e)
+                self._voronoi.append(e.rot)
+
         self.run_prim()
+
 
 def _delaunay(s, edges, bad_edges):
     if len(s) < 2:
