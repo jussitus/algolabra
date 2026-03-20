@@ -26,16 +26,16 @@ class Delaunay:
     """
 
     def __init__(self, vertices):
-        self._vertices = sorted(vertices)
-        self._edges = []
-        self._left = None
-        self._right = None
-        self._triangles = []
-        self._hull = []
-        self._delaunay = []
-        self._voronoi = []
-        self._mst_delaunay = []
-        self._mst_voronoi = []
+        self._vertices: list[tuple[int | float, int | float]] = sorted(vertices)
+        self._edges: list[Edge] = []
+        self._left: Edge | None = None
+        self._right: Edge | None = None
+        self._triangles: list[list[Edge]] = []
+        self._hull: list[Edge] = []
+        self._delaunay: list[Edge] = []
+        self._voronoi: list[Edge] = []
+        self._mst_delaunay: list[Edge] = []
+        self._mst_voronoi: list[Edge] = []
 
     @property
     def vertices(self):
@@ -72,7 +72,7 @@ class Delaunay:
         Each triangle is a list of three edges in the counterclockwise direction. The list of triangles is populated the first time this property is accessed.
         """
 
-        if len(self._triangles) > 0 or len(self.edges) == 0:
+        if len(self._triangles) > 0 or self.left is None:
             return self._triangles
         triangles = []
         for e in self.edges:
@@ -90,7 +90,7 @@ class Delaunay:
         The list is populated the first time this property is accessed.
         """
 
-        if len(self._hull) > 0 or len(self.edges) == 0:
+        if len(self._hull) > 0 or self.left is None:
             return self._hull
         hull = [self.left]
         first = self.left

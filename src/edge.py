@@ -18,15 +18,15 @@ class Edge:
     ]
 
     def __init__(self):
-        self.org = None
-        self.sym = None
-        self.onext = self
-        self.rot = None
-        self.tor = None
-        self.dual = False
+        self.org: tuple[int | float, int | float] | None = None
+        self.sym: Edge | None = None
+        self.onext: Edge | None = self
+        self.rot: Edge | None = None
+        self.tor: Edge | None = None
+        self.dual: bool = False
         self.data = None
-        self.radius = None
-        self._length = None
+        self.radius: float | None = None
+        self._length: float | None = None
 
     @property
     def lnext(self):
@@ -127,11 +127,11 @@ def delete_quad_edge(e):
     splice(e.sym, e.sym.oprev)
 
 
-def triangle_ccw(e: Edge) -> tuple[Edge]:
+def triangle_ccw(e: Edge) -> tuple[Edge, Edge, Edge]:
     return (e, e.lnext, e.lnext.lnext)
 
 
-def triangle_cw(e: Edge) -> tuple[Edge]:
+def triangle_cw(e: Edge) -> tuple[Edge, Edge, Edge]:
     return (e, e.rnext, e.rnext.rnext)
 
 
