@@ -18,7 +18,7 @@ d = Delaunay(lab.room_centers)
 d.run()
 
 P = nx.Graph()
-for e in d.mst:
+for e in d.mst_delaunay:
     P.add_edge(e.org, e.dest)
 pos_p = {node: node for node in P.nodes()}
 nx.draw(

@@ -1,4 +1,4 @@
-from math import sqrt, log
+from math import sqrt
 import heapq as hq
 from edge import (
     Edge,
@@ -16,10 +16,15 @@ from condition import (
     left_of,
     valid,
 )
-from time import time
 
 
 class Delaunay:
+    """Class representing a planar graph.
+
+    Args:
+        vertices: a list of (x,y) points
+    """
+
     def __init__(self, vertices):
         self._vertices = sorted(vertices)
         self._edges = []
@@ -29,26 +34,44 @@ class Delaunay:
         self._hull = []
         self._delaunay = []
         self._voronoi = []
-        self._mst = []
+        self._mst_delaunay = []
+        self._mst_voronoi = []
 
     @property
     def vertices(self):
+        """Vertices of the graph."""
+
         return self._vertices
 
     @property
     def edges(self):
+        """Edges of the graph, including all of the four edges of a quad-edge."""
         return self._edges
 
     @property
     def left(self):
+        """Left edge of the Delaunay triangualtion as given by the Guibas-Stolfi divide-and-conquer algorithm.
+
+        The left edge's origin is the leftmost vertex of the graph. It is a hull edge in the counterclockwise direction.
+        """
+
         return self._left
 
     @property
     def right(self):
+        """Right edge of the Delaunay Triangulation as given by the Guibas-Stolfi divide-and-conquer algorithm.
+
+        The right edge's origin is the rightmost vertex of the graph. It is a hull edge in the clockwise direction.
+        """
         return self._right
 
     @property
     def triangles(self):
+        """Triangles in the Delaunay triangulation.
+
+        Each triangle is a list of three edges in the counterclockwise direction. The list of triangles is populated the first time this property is accessed.
+        """
+
         if len(self._triangles) > 0 or len(self.edges) == 0:
             return self._triangles
         triangles = []
@@ -62,6 +85,11 @@ class Delaunay:
 
     @property
     def hull(self):
+        """Hull edges of the Delaunay triangulation.
+
+        The list is populated the first time this property is accessed.
+        """
+
         if len(self._hull) > 0 or len(self.edges) == 0:
             return self._hull
         hull = [self.left]
@@ -75,23 +103,36 @@ class Delaunay:
 
     @property
     def delaunay(self):
+        """Edges in the Delaunay triangulation, without their symmetric (Sym) edges."""
+
         return self._delaunay
 
     @property
     def voronoi(self):
+        """Edges in the Voronoi diagram, without their symmetric (Sym) edges."""
+
         return self._voronoi
 
     @property
-    def mst(self):
-        return self._mst
+    def mst_delaunay(self):
+        """Edges in the minimum spanning tree of the Delaunay triangulation."""
 
-    def run_prim(self):
-        start = time()
+        return self._mst_delaunay
+
+    def run_prim(self, graph):
+        """Calculates the minimum spanning tree of a graph using Prim's algorith.
+
+        Args:
+            graph: Edges of a Delaunay triangulation or a Voronoi diagram.
+
+        Returns:
+            A list of the edges in the minimum spanning tree.
+        """
         visited = {}
         mst = []
         heap = []
 
-        first = self._delaunay[2]
+        first = graph[0]
         hq.heappush(heap, first.sym)
         visited[first.org] = True
         current = first.onext
@@ -108,20 +149,27 @@ class Delaunay:
             if not visited.get(first.org, False):
                 mst.append(first)
                 visited[first.org] = True
-        end = time()
-        total = end - start
-        n = len(self._vertices)
-        ratio = total / (n * log(n))
-        print(f"PRIM: n = {n}, ratio = {ratio}, time = {total}")
-        print
-        self._mst = mst
+        return mst
 
-    def run_delaunay(self):
-        self._left, self._right, bad_edges = _delaunay(self._vertices, self._edges, [])
-        self._edges = list(set(self.edges) - set(bad_edges))
+    def run_delaunay(self, vertices):
+        """Computes the Delaunay triangulation using the Guibas-Stolfi divide-and-conquer algorithm.
 
-    def run_voronoi(self):
-        for t in self.triangles:
+        Args:
+            vertices: Vertices of the graph.
+
+        Returns:
+            A tuple consisting of the left edge, the right edge, and a list of all edges in the Delaunay triangulation and the Voronoi diagram, and their symmetric counterparts.
+        """
+        left, right, bad_edges = _delaunay(self._vertices, self._edges, [])
+        edges = list(set(self.edges) - set(bad_edges))
+        return left, right, edges
+
+    def run_voronoi(self, triangles):
+        """Computes the origin (org) and destination (dest) coordinates of the Voronoi edges, and the radius of the circumcircle of centered around the origin.
+
+        The outer edges of the Voronoi diagram extend to infinity, which is treated as a single point.
+        """
+        for t in triangles:
             for e in t:
                 vo = e.rot
 
@@ -136,15 +184,16 @@ class Delaunay:
                 vo.sym.radius = r
 
     def run(self):
-        self.run_delaunay()
-        self.run_voronoi()
+        """Computes the graph's Delaunay triangulation, coordinates of the Voronoi edges, and the minimum spanning tree of the Delaunay triangulation."""
+        self._left, self._right, self._edges = self.run_delaunay(self.vertices)
+        self.run_voronoi(self.triangles)
 
         for e in self.edges:
             if not e.dual and e.org < e.dest:
                 self._delaunay.append(e)
                 self._voronoi.append(e.rot)
 
-        self.run_prim()
+        self._mst_delaunay = self.run_prim(self._delaunay)
 
 
 def _delaunay(s, edges, bad_edges):
