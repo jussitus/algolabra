@@ -18,11 +18,7 @@ class Edge:
     ]
 
     def __init__(self):
-        self.org: tuple[int | float, int | float] | None = None
-        self.sym: Edge | None = None
         self.onext: Edge | None = self
-        self.rot: Edge | None = None
-        self.tor: Edge | None = None
         self.dual: bool = False
         self.data = None
         self.radius: float | None = None
@@ -61,7 +57,7 @@ class Edge:
                     + (self.dest[1] - self.sym.dest[1]) ** 2
                 )
             else:
-                return float("-Infinity")  # infinite voronoi edge
+                return float("inf")
         return self._length
 
     def __str__(self):
@@ -101,6 +97,8 @@ def make_quad_edge(org, dest):
     e_rot.tor = e
     e_tor.tor = e_sym
 
+    e.dual = False
+    e.sym.dual = False
     e_rot.dual = True
     e_tor.dual = True
 
