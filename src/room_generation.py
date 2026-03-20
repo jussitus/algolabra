@@ -28,7 +28,6 @@ class Labyrinth:
         )
 
     def generate_rooms(self, n):
-        print(f"mw: {self.max_width}, mh: {self.max_height}")
         rooms = []
         room_centers = []
         gap = self.gap + 1
@@ -53,7 +52,6 @@ class Labyrinth:
                         valid = False
                         break
             if not valid:
-                # print(f"Invalid: {n}")
                 tries += 1
                 continue
             tries = 0
@@ -65,7 +63,6 @@ class Labyrinth:
                     room_squares[corner[1] + h][corner[0] + w] = room
             rooms.append(room)
             room_centers.append(room.center)
-            # print(f"n: {n}, rooms: {len(rooms)}")
         return rooms, room_squares, room_centers
 
 

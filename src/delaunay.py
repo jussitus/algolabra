@@ -38,18 +38,18 @@ class Delaunay:
         self._mst_voronoi: list[Edge] = []
 
     @property
-    def vertices(self):
+    def vertices(self) -> list[tuple[int | float, int | float]]:
         """Vertices of the graph."""
 
         return self._vertices
 
     @property
-    def edges(self):
+    def edges(self) -> list[Edge]:
         """Edges of the graph, including all of the four edges of a quad-edge."""
         return self._edges
 
     @property
-    def left(self):
+    def left(self) -> Edge | None:
         """Left edge of the Delaunay triangualtion as given by the Guibas-Stolfi divide-and-conquer algorithm.
 
         The left edge's origin is the leftmost vertex of the graph. It is a hull edge in the counterclockwise direction.
@@ -58,7 +58,7 @@ class Delaunay:
         return self._left
 
     @property
-    def right(self):
+    def right(self) -> Edge | None:
         """Right edge of the Delaunay Triangulation as given by the Guibas-Stolfi divide-and-conquer algorithm.
 
         The right edge's origin is the rightmost vertex of the graph. It is a hull edge in the clockwise direction.
@@ -66,7 +66,7 @@ class Delaunay:
         return self._right
 
     @property
-    def triangles(self):
+    def triangles(self) -> list[list[Edge]]:
         """Triangles in the Delaunay triangulation.
 
         Each triangle is a list of three edges in the counterclockwise direction. The list of triangles is populated the first time this property is accessed.
@@ -84,7 +84,7 @@ class Delaunay:
         return self._triangles
 
     @property
-    def hull(self):
+    def hull(self) -> list[Edge]:
         """Hull edges of the Delaunay triangulation.
 
         The list is populated the first time this property is accessed.
@@ -102,24 +102,24 @@ class Delaunay:
         return self._hull
 
     @property
-    def delaunay(self):
+    def delaunay(self) -> list[Edge]:
         """Edges in the Delaunay triangulation, without their symmetric (Sym) edges."""
 
         return self._delaunay
 
     @property
-    def voronoi(self):
+    def voronoi(self) -> list[Edge]:
         """Edges in the Voronoi diagram, without their symmetric (Sym) edges."""
 
         return self._voronoi
 
     @property
-    def mst_delaunay(self):
+    def mst_delaunay(self) -> list[Edge]:
         """Edges in the minimum spanning tree of the Delaunay triangulation."""
 
         return self._mst_delaunay
 
-    def run_prim(self, graph):
+    def run_prim(self, graph: list[Edge]) -> list[Edge]:
         """Calculates the minimum spanning tree of a graph using Prim's algorith.
 
         Args:
@@ -151,7 +151,7 @@ class Delaunay:
                 visited[first.org] = True
         return mst
 
-    def run_delaunay(self, vertices):
+    def run_delaunay(self, vertices: list[tuple]):
         """Computes the Delaunay triangulation using the Guibas-Stolfi divide-and-conquer algorithm.
 
         Args:

@@ -11,106 +11,43 @@ from math import log
 from room_generation import Labyrinth
 
 
-n = 10000
+n = 25
 lab = Labyrinth(n)
-exit()
-
-
-n = 100000
-s = points_circular(n, n, n, 1)
-start = time()
-d = Delaunay(s)
+print(f"n={len(lab.rooms)}")
+d = Delaunay(lab.room_centers)
 d.run()
-exit()
-end = time()
-total = end - start
-ratio = total / (n * log(n))
-print(f"n = {n}, ratio = {ratio}, time = {total}")
 
-print(f"edges: {len(d.edges)}")
-print(f"vertices: {len(d.vertices)}")
-print(f"delaunay lenth: {len(d.delaunay)}")
-# for e in d.delaunay:
-# print(f"{e.org} -> {e.dest}")
-# for e in d.delaunay:
-#     print(e)
+P = nx.Graph()
+for e in d.mst_delaunay:
+    P.add_edge(e.org, e.dest)
+pos_p = {node: node for node in P.nodes()}
+nx.draw(
+    P,
+    pos_p,
+    with_labels=False,
+    edge_color="red",
+    node_color="red",
+    node_size=0,
+)
 
 
-print(f"voronoi lenth: {len(d.voronoi)}")
-print(f"hull len = {len(d.hull)}")
-# start = time()
-# d.run_voronoi()
-# took = time() - start
-# print(f"Calculated Voronoi, took: {took:.4f}")
+L = nx.Graph()
+for room in lab.rooms:
+    L.add_edge(room.corner_upper_left, room.corner_upper_right)
+    L.add_edge(room.corner_lower_left, room.corner_lower_right)
+    L.add_edge(room.corner_upper_left, room.corner_lower_left)
+    L.add_edge(room.corner_upper_right, room.corner_lower_right)
 
-print(f"mst size: {len(d.mst)}")
-total = 0
-for e in d.mst:
-    total += e.length
-print(f"mst length: {total}")
-D = nx.Graph()
-for e in d.mst:
-    # print(e)
-    a = e.org
-    b = e.dest
-    D.add_edge(a, b)
-# for t in d.triangles:
-#     for e in t:
-#         a = e.org
-#         b = e.dest
-#         D.add_edge(a, b)
-D = nx.Graph()
-for e in d.mst:
-    # print(e)
-    a = e.org
-    b = e.dest
-    D.add_edge(a, b)
-# for t in d.triangles:
-#     for e in t:
-#         a = e.org
-#         b = e.dest
-#         D.add_edge(a, b)
-
-pos_d = {node: node for node in D.nodes()}
+pos_l = {node: node for node in L.nodes()}
 
 nx.draw(
-    D,
-    pos_d,
+    L,
+    pos_l,
     with_labels=False,
     edge_color="black",
     node_color="black",
-    node_size=10,
+    node_size=0,
 )
-D_v = nx.Graph()
-for e in d.delaunay:
-    # print(e)
-    a = e.org
-    b = e.dest
-    D_v.add_node(a)
-    D_v.add_node(b)
-pos_d_v = {node: node for node in D_v.nodes()}
-nx.draw_networkx_nodes(
-    D_v,
-    pos_d_v,
-    node_color="green",
-    node_size=10,
-)
-
-# V = nx.Graph()
-# for e in d.edges:
-#     if e.dual and e.org is not None and e.dest is not None:
-#         a = e.org
-#         b = e.dest
-#         V.add_edge(a, b)
-# pos_v = {node: node for node in V.nodes()}
-# nx.draw(V, pos_v, with_labels=False, edge_color="red", node_color="red", node_size=10)
-
-#
 ax = plt.gca()
 ax.set_aspect("equal", adjustable="datalim")
-# ccs = circumcircles(edges)
-# for c in ccs:
-#     circle = plt.Circle(c[0], c[1], color=("blue", 0.1), fill=False)
-#     # ax.add_patch(circle)
-
 plt.show()

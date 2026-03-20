@@ -1,6 +1,8 @@
 from math import sqrt
 from condition import ccw
 
+Point = tuple[int | float, int | float]
+
 
 class Edge:
     """Delaunay triangulaation peruspalikka, placeholder"""
@@ -18,7 +20,11 @@ class Edge:
     ]
 
     def __init__(self):
-        self.onext: Edge | None = self
+        self.org: Point = None  # type: ignore
+        self.sym: Edge = None  # type: ignore
+        self.onext: Edge = self
+        self.rot: Edge = None  # type: ignore
+        self.tor: Edge = None  # type: ignore
         self.dual: bool = False
         self.data = None
         self.radius: float | None = None
@@ -57,7 +63,7 @@ class Edge:
                     + (self.dest[1] - self.sym.dest[1]) ** 2
                 )
             else:
-                return float("inf")
+                return float("inf")  # infinite voronoi edge
         return self._length
 
     def __str__(self):
