@@ -7,14 +7,17 @@ from math import floor
 from room_generation import Labyrinth
 from PIL import Image, ImageDraw, ImageOps
 
-n = 100
+n = 10000
 lab = Labyrinth(n)
+#points = points_circular(n, 10000, 10000, 42)
 print(f"n={len(lab.rooms)}")
 d = Delaunay(lab.room_centers)
+#d = Delaunay(points)
 d.run()
+#exit()
 extrema = d.extreme_vertices()
-max_width = extrema["max_x"][0]
-max_height = extrema["max_y"][1]
+max_width = extrema["max_x"][0] + lab.max_width
+max_height = extrema["max_y"][1] + lab.max_height
 anti_alias = 1
 canvas_width = 2048
 canvas_height = 2048
@@ -27,12 +30,12 @@ im = Image.new('RGB', (floor(anti_alias * canvas_width), floor(anti_alias * canv
 
 
 draw = ImageDraw.Draw(im)
-# for e in d.voronoi:
-#     if e.length == float('inf'):
-#         continue
-#     org = tuple(map(lambda x: x*scale, e.org))
-#     dest = tuple(map(lambda x: x*scale, e.dest))
-#     draw.line((org,dest), fill='red', width=canvas_width // 100)
+for e in d.delaunay:
+    if e.length == float('inf'):
+        continue
+    org = tuple(map(lambda x: x*scale, e.org))
+    dest = tuple(map(lambda x: x*scale, e.dest))
+    draw.line((org,dest), fill='red', width=canvas_width // 1000)
 
 
 
@@ -53,6 +56,8 @@ for square in corridors:
     p2_x = p2[0]*scale
     p2_y = p2[1]*scale
     draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill="blue", outline=None, width=canvas_width // 50)
+
+
 im = ImageOps.expand(im, border=padding, fill=bg)
 #im = im.resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
 

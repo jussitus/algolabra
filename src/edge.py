@@ -92,8 +92,8 @@ class Edge:
         if self._length is None:
             if self.org is not None and self.dest is not None:
                 self._length = sqrt(
-                    (self.org[0] - self.sym.org[0]) ** 2
-                    + (self.dest[1] - self.sym.dest[1]) ** 2
+                    (self.org[0] - self.dest[0]) ** 2
+                    + (self.org[1] - self.dest[1]) ** 2
                 )
             else:
                 return float("inf")  # infinite voronoi edge

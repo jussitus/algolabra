@@ -248,31 +248,45 @@ def _delaunay(s, edges, bad_edges):
     # merge loop
     while True:
         lcand = basel.sym.onext
-        if valid(lcand, basel):
-            while incircle(basel.dest, basel.org, lcand.dest, lcand.onext.dest):
+
+        # caching
+        basel_org = basel.org
+        basel_dest = basel.dest
+        basel_sym = basel.sym
+        lvalid = valid(lcand, basel)
+
+        if lvalid:
+            while incircle(basel_dest, basel_org, lcand.dest, lcand.onext.dest):
                 t = lcand.onext
                 delete_quad_edge(lcand)
                 bad_edges.extend([lcand, lcand.sym, lcand.rot, lcand.tor])
                 lcand = t
-        rcand = basel.oprev
 
-        if valid(rcand, basel):
-            while incircle(basel.dest, basel.org, rcand.dest, rcand.oprev.dest):
+        rcand = basel.oprev
+        rvalid = valid(rcand, basel)
+
+        if rvalid:
+            while incircle(basel_dest, basel_org, rcand.dest, rcand.oprev.dest):
                 t = rcand.oprev
                 delete_quad_edge(rcand)
                 bad_edges.extend([rcand, rcand.sym, rcand.rot, rcand.tor])
                 rcand = t
 
-        if not valid(lcand, basel) and not valid(rcand, basel):
+        lcand_dest = lcand.dest
+        rcand_dest = rcand.dest
+        lvalid = valid(lcand, basel)
+        rvalid = valid(rcand, basel)
+
+        if not lvalid and not rvalid:
             break
 
-        if not valid(lcand, basel) or (
-            valid(rcand, basel)
-            and incircle(lcand.dest, lcand.org, rcand.org, rcand.dest)
+        if not lvalid or (
+            rvalid
+            and incircle(lcand_dest, lcand.org, rcand.org, rcand_dest)
         ):
-            basel = connect(rcand, basel.sym)
+            basel = connect(rcand, basel_sym)
             edges.extend([basel, basel.sym, basel.rot, basel.tor])
         else:
-            basel = connect(basel.sym, lcand.sym)
+            basel = connect(basel_sym, lcand.sym)
             edges.extend([basel, basel.sym, basel.rot, basel.tor])
     return (ldo, rdo, bad_edges)

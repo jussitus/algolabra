@@ -4,6 +4,9 @@ import heapq as hq
 from tqdm import tqdm
 from delaunay import Delaunay
 from point import Point
+
+# REDO
+
 class Room:
     def __init__(self, corner, width, height):
         self.corner_upper_left: Point = corner
@@ -52,7 +55,7 @@ class Labyrinth:
         seed(42)
         while len(rooms) < n:
             if tries == self.max_tries:
-                print(f"Could not fit any more rooms in {self.max_tries} tries. Trying more sparse layout...")
+                #print(f"Could not fit any more rooms in {self.max_tries} tries. Trying more sparse layout...")
                 self.sparsity *= 1.05
                 return self.generate_rooms(self.max_rooms)
             valid = True
