@@ -7,13 +7,14 @@ from math import floor
 from room_generation import Labyrinth
 from PIL import Image, ImageDraw, ImageOps
 
-n = 5
+n = 25
 lab = Labyrinth(n)
-points = points_circular(n, n // 2, n // 2, 42)
-#print(f"n={len(lab.rooms)}")
-#d = PlanarGraph(lab.room_centers)
-d = PlanarGraph(points)
+#points = points_circular(n, n // 2, n // 2, 42)
+print(f"n={len(lab.rooms)}")
+d = PlanarGraph(lab.room_centers)
+#d = PlanarGraph(points)
 d.run()
+
 for t in d.triangles:
     for e in t:
         print(e)
@@ -43,23 +44,23 @@ for e in d.delaunay:
 
 
 
-# for room in lab.rooms:
-#     p1 = room.corner_upper_left
-#     p2 = room.corner_lower_right
-#     p1_x = p1[0]*scale
-#     p1_y = p1[1]*scale
-#     p2_x = p2[0]*scale
-#     p2_y = p2[1]*scale
-#     draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill=fg, outline=None)
-# corridors = [(x,y) for y, col in enumerate(lab.corridor_squares) for x, cor in enumerate(col) if cor]
-# for square in corridors:
-#     p1 = square
-#     p2 = (square[0] + 1, square[1] + 1)
-#     p1_x = p1[0]*scale
-#     p1_y = p1[1]*scale
-#     p2_x = p2[0]*scale
-#     p2_y = p2[1]*scale
-#     draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill="blue", outline=None, width=canvas_width // 50)
+for room in lab.rooms:
+    p1 = room.corner_upper_left
+    p2 = room.corner_lower_right
+    p1_x = p1[0]*scale
+    p1_y = p1[1]*scale
+    p2_x = p2[0]*scale
+    p2_y = p2[1]*scale
+    draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill=fg, outline=None)
+corridors = [(x,y) for y, col in enumerate(lab.corridor_squares) for x, cor in enumerate(col) if cor]
+for square in corridors:
+    p1 = square
+    p2 = (square[0] + 1, square[1] + 1)
+    p1_x = p1[0]*scale
+    p1_y = p1[1]*scale
+    p2_x = p2[0]*scale
+    p2_y = p2[1]*scale
+    draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill="blue", outline=None, width=canvas_width // 50)
 
 
 im = ImageOps.expand(im, border=padding, fill=bg)

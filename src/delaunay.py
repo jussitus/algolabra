@@ -181,7 +181,7 @@ def _voronoi(triangles: list[list[Edge]], hull: list[Edge]) -> list[Edge]:
     return voronoi_edges
 
 def _prim(graph: list[Edge]) -> list[Edge]:
-    """Calculates the minimum spanning tree of a triangulated graph using Prim's algorith.
+    """Calculates the minimum spanning tree of a graph using Prim's algorith.
 
     Args:
         graph: Edges of a Delaunay triangulation or a Voronoi diagram.

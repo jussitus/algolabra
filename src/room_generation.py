@@ -5,7 +5,7 @@ from tqdm import tqdm
 from delaunay import PlanarGraph
 from point import Point
 
-# REDO
+# REDO THIS
 
 class Room:
     def __init__(self, corner, width, height):
