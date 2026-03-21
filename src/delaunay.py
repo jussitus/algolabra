@@ -81,10 +81,11 @@ class PlanarGraph:
         if len(self._triangles) > 0 or self.left is None:
             return self._triangles
         triangles = []
-        for e in self.edges:
-            if e.dual or e.sym in self.hull:
+        for e in self.delaunay:
+            a, b, c = triangle_ccw(e)
+            if not (a.org < b.org and a.org < c.org):
                 continue
-            if e.org[0] <= e.lnext.org[0] and e.org[0] <= e.lnext.lnext.org[0]:
+            if ccw(a.org, b.org, c.org):
                 triangles.append(triangle_ccw(e))
         self._triangles = triangles
         return self._triangles

@@ -13,10 +13,12 @@ from sympy import Matrix
 import pytest
 from point_generation import points_circular
 from delaunay import PlanarGraph
-from tqdm import tqdm
-N_SMALL = 5
-N_LARGE = 5
+from condition import incircle
+N_SMALL = 100
+N_MEDIUM = 1000
+N_LARGE = 10000
 POINTS_SMALL = points_circular(N_SMALL, N_SMALL // 2, N_SMALL // 2, 42)
+POINTS_MEDIUM = points_circular(N_MEDIUM, N_MEDIUM // 2, N_MEDIUM // 2, 42)
 POINTS_LARGE = points_circular(N_LARGE, N_LARGE // 2, N_LARGE // 2, 42)
 
 @pytest.fixture
@@ -26,12 +28,18 @@ def graph_small() -> PlanarGraph:
     return graph
 
 @pytest.fixture
+def graph_medium() -> PlanarGraph:
+    graph = PlanarGraph(POINTS_MEDIUM)
+    graph.run()
+    return graph
+
+@pytest.fixture
 def graph_large() -> PlanarGraph:
     graph = PlanarGraph(POINTS_LARGE)
     graph.run()
     return graph
 
-def incircle(a,b,c,d) -> bool:
+def slow_incircle(a,b,c,d) -> bool:
     matrix = Matrix(
         [
             [a[0], a[1], (a[0]) ** 2 + (a[1]) ** 2, 1],
@@ -44,16 +52,21 @@ def incircle(a,b,c,d) -> bool:
     return det > 0
 
 
-def test_delaunay_condition(graph_small):
-    all_correct = True
-    for t in graph_small.triangles:
+def test_delaunay_condition_independent(graph_small):
+    graph = graph_small
+    for t in graph.triangles:
         triangle_vertices = [v.org for v in t]
-        correct = True
-        for v in graph_small.vertices:
+        for v in graph.vertices:
             if v not in triangle_vertices:
-                correct = not incircle(triangle_vertices[0], triangle_vertices[1], triangle_vertices[2], v)
-        all_correct = correct
-    assert all_correct
+                assert not incircle(triangle_vertices[0], triangle_vertices[1], triangle_vertices[2], v)
+
+def test_delaunay_condition_dependent(graph_medium):
+    graph = graph_medium
+    for t in graph.triangles:
+        triangle_vertices = [v.org for v in t]
+        for v in graph.vertices:
+            if v not in triangle_vertices:
+                assert not incircle(triangle_vertices[0], triangle_vertices[1], triangle_vertices[2], v)
 
 def test_delaunay_correct_number_of_edges(graph_large):
     k = len(graph_large.hull)
@@ -65,4 +78,13 @@ def test_delaunay_correct_number_of_triangles(graph_large):
     k = len(graph_large.hull)
     n = len(graph_large.vertices)
     triangles = (2*n - 2 - k)
-    assert len(graph_large.triangles) == triangles 
+    assert len(graph_large.triangles) == triangles
+
+def test_each_hull_edge_in_only_one_triangle(graph_large):
+    graph = graph_large
+    for e in graph.hull:
+        count = 0
+        for t in graph.triangles:
+            if e in t:
+                count += 1
+        assert count == 1
