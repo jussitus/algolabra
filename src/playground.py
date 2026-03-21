@@ -7,18 +7,13 @@ from math import floor
 from labyrinth import Labyrinth
 from PIL import Image, ImageDraw, ImageOps
 
-n = 25
+n = 1000
 lab = Labyrinth(n)
 #points = points_circular(n, n // 2, n // 2, 42)
 print(f"n={len(lab.rooms)}")
 d = PlanarGraph(lab.room_centers)
 #d = PlanarGraph(points)
 d.run()
-
-for t in d.triangles:
-    for e in t:
-        print(e)
-    print("###")
 #exit()
 extrema = d.extreme_vertices()
 max_width = extrema["max_x"][0] + lab.max_width
@@ -35,7 +30,7 @@ im = Image.new('RGB', (floor(anti_alias * canvas_width), floor(anti_alias * canv
 
 
 draw = ImageDraw.Draw(im)
-for e in d.delaunay:
+for e in d.voronoi:
     if e.length == float('inf'):
         continue
     org = tuple(map(lambda x: x*scale, e.org))

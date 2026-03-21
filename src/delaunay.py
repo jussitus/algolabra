@@ -28,7 +28,7 @@ class PlanarGraph:
     """
 
     def __init__(self, vertices):
-        self._vertices: list[tuple[int | float, int | float]] = sorted(vertices)
+        self._vertices: list[tuple[float, float]] = sorted(vertices)
         self._edges: list[Edge] = []
         self._left: Edge | None = None
         self._right: Edge | None = None
@@ -122,7 +122,7 @@ class PlanarGraph:
         """Edges in the minimum spanning tree of the Delaunay triangulation."""
         return self._mst_delaunay
 
-    def compute_mst_delaunay(self) -> list[Edge]:
+    def _compute_mst_delaunay(self) -> list[Edge]:
         """Calculates the minimum spanning tree of a Delaunay triangulation.
 
         Returns:
@@ -130,7 +130,7 @@ class PlanarGraph:
         """
         return _prim(self.delaunay)
     
-    def compute_delaunay(self):
+    def _compute_delaunay(self):
         """Computes the Delaunay triangulation using the Guibas-Stolfi divide-and-conquer algorithm.
 
         Args:
@@ -147,7 +147,7 @@ class PlanarGraph:
                 delaunay_edges.append(e)
         return left, right, edges, delaunay_edges
 
-    def compute_voronoi(self):
+    def _compute_voronoi(self):
         """REDO DOCSTRING Computes the origin (org) and destination (dest) coordinates of the Voronoi edges, and the radius of the circumcircle of centered around the origin.
 
         The outer edges of the Voronoi diagram extend to infinity, which is treated as a single point.
@@ -156,9 +156,9 @@ class PlanarGraph:
 
     def run(self):
         """Computes the graph's Delaunay triangulation, coordinates of the Voronoi edges, and the minimum spanning tree of the Delaunay triangulation."""
-        self._left, self._right, self._edges, self._delaunay = self.compute_delaunay()
-        self._voronoi = self.compute_voronoi()
-        self._mst_delaunay = self.compute_mst_delaunay()
+        self._left, self._right, self._edges, self._delaunay = self._compute_delaunay()
+        self._voronoi = self._compute_voronoi()
+        self._mst_delaunay = self._compute_mst_delaunay()
 
 
 def _voronoi(triangles: list[list[Edge]], hull: list[Edge]) -> list[Edge]:
