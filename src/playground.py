@@ -4,7 +4,7 @@ from point_generation import points_random, points_circular, points_circular_uni
 from condition import ccw
 from time import time
 from math import floor
-from room_generation import Labyrinth
+from labyrinth import Labyrinth
 from PIL import Image, ImageDraw, ImageOps
 
 n = 25
