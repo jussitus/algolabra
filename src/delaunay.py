@@ -20,7 +20,7 @@ from condition import (
 )
 from point import Point
 
-class Delaunay:
+class PlanarGraph:
     """Class representing a planar graph.
 
     Args:
@@ -155,11 +155,9 @@ class Delaunay:
 
     def run(self):
         """Computes the graph's Delaunay triangulation, coordinates of the Voronoi edges, and the minimum spanning tree of the Delaunay triangulation."""
-        print("Started triangulating.")
         self._left, self._right, self._edges, self._delaunay = self.compute_delaunay()
         self._voronoi = self.compute_voronoi()
         self._mst_delaunay = self.compute_mst_delaunay()
-        print("MST done.")
 
 
 def _voronoi(triangles: list[list[Edge]], hull: list[Edge]) -> list[Edge]:
@@ -239,8 +237,8 @@ def _delaunay(s, edges, bad_edges):
         return (a, b.sym, bad_edges)
 
     mid = len(s) // 2
-    (ldo, ldi, lbad_edges) = _delaunay(s[:mid], edges, bad_edges)
-    (rdi, rdo, rbad_edges) = _delaunay(s[mid:], edges, bad_edges)
+    (ldo, ldi, _) = _delaunay(s[:mid], edges, bad_edges)
+    (rdi, rdo, _) = _delaunay(s[mid:], edges, bad_edges)
     while True:
         if left_of(rdi.org, ldi):
             ldi = ldi.lnext

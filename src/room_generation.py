@@ -2,7 +2,7 @@ from random import randint, seed
 from math import sqrt, floor
 import heapq as hq
 from tqdm import tqdm
-from delaunay import Delaunay
+from delaunay import PlanarGraph
 from point import Point
 
 # REDO
@@ -85,7 +85,7 @@ class Labyrinth:
         return rooms, room_squares, room_centers
 
     def connect_rooms(self, room_centers):
-        d = Delaunay(room_centers)
+        d = PlanarGraph(room_centers)
         d.run()
         return d.mst_delaunay
         
