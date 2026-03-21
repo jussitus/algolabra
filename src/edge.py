@@ -109,7 +109,7 @@ class Edge:
 
 
 def make_quad_edge(org, dest) -> Edge:
-    """doc string to do"""
+    """Doc string to do"""
     e = Edge()
     e_sym = Edge()
     e_rot = Edge()
@@ -147,7 +147,7 @@ def make_quad_edge(org, dest) -> Edge:
 
 
 def splice(a: Edge, b: Edge):
-    """docstring to do"""
+    """Docstring to do"""
     alpha = a.onext.rot
     beta = b.onext.rot
 
@@ -156,7 +156,7 @@ def splice(a: Edge, b: Edge):
 
 
 def connect(a: Edge, b: Edge) -> Edge:
-    """docstring to do"""
+    """Docstring to do"""
     e = make_quad_edge(a.dest, b.org)
     splice(e, a.lnext)
     splice(e.sym, b)
@@ -164,23 +164,23 @@ def connect(a: Edge, b: Edge) -> Edge:
 
 
 def delete_quad_edge(e: Edge):
-    """docstring to do"""
+    """Docstring to do"""
     splice(e, e.oprev)
     splice(e.sym, e.sym.oprev)
 
 
 def triangle_ccw(e: Edge) -> tuple[Edge, Edge, Edge]:
-    """docstring to do"""
+    """Docstring to do"""
     return (e, e.lnext, e.lnext.lnext)
 
 
 def triangle_cw(e: Edge) -> tuple[Edge, Edge, Edge]:
-    """docstring to do"""
+    """Docstring to do"""
     return (e, e.rnext, e.rnext.rnext)
 
 
 def circumcircle(e: Edge) -> tuple[Point, float]:
-    """docstring to do"""
+    """Docstring to do"""
     a, b, c = triangle_ccw(e)
     d = 2 * (
         a.org[0] * (b.org[1] - c.org[1])

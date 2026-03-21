@@ -20,6 +20,7 @@ from condition import (
 )
 from point import Point
 
+
 class PlanarGraph:
     """Class representing a planar graph.
 
@@ -51,6 +52,7 @@ class PlanarGraph:
         min_y = min(self.vertices, key=(lambda v: v[1]))
         max_y = max(self.vertices, key=(lambda v: v[1]))
         return {"min_x": min_x, "max_x": max_x, "min_y": min_y, "max_y": max_y}
+
     @property
     def edges(self) -> list[Edge]:
         """Edges of the graph, including all of the four edges of a quad-edge."""
@@ -129,7 +131,7 @@ class PlanarGraph:
             A list of the edges in the minimum spanning tree.
         """
         return _prim(self.delaunay)
-    
+
     def _compute_delaunay(self):
         """Computes the Delaunay triangulation using the Guibas-Stolfi divide-and-conquer algorithm.
 
@@ -162,7 +164,7 @@ class PlanarGraph:
 
 
 def _voronoi(triangles: list[list[Edge]], hull: list[Edge]) -> list[Edge]:
-    """docstring todo"""
+    """Docstring todo"""
     voronoi_edges = []
     for t in triangles:
         for e in t:
@@ -179,6 +181,7 @@ def _voronoi(triangles: list[list[Edge]], hull: list[Edge]) -> list[Edge]:
             if vo.org < vo.dest:
                 voronoi_edges.append(vo)
     return voronoi_edges
+
 
 def _prim(graph: list[Edge]) -> list[Edge]:
     """Calculates the minimum spanning tree of a graph using Prim's algorith.
@@ -212,8 +215,9 @@ def _prim(graph: list[Edge]) -> list[Edge]:
             visited[first.org] = True
     return mst
 
+
 def _delaunay(s, edges, bad_edges):
-    """docstring to-do"""
+    """Docstring to-do"""
     if len(s) < 2:
         raise ValueError(f"len(s)={len(s)} is less than 2")
     if len(s) == 2:
@@ -290,8 +294,7 @@ def _delaunay(s, edges, bad_edges):
             break
 
         if not lvalid or (
-            rvalid
-            and incircle(lcand_dest, lcand.org, rcand.org, rcand_dest)
+            rvalid and incircle(lcand_dest, lcand.org, rcand.org, rcand_dest)
         ):
             basel = connect(rcand, basel_sym)
             edges.extend([basel, basel.sym, basel.rot, basel.tor])

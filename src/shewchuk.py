@@ -21,6 +21,7 @@ _shewchuk.orient2d.argtypes = [
 ]
 _shewchuk.orient2d.restype = ctypes.c_double
 
+
 def incircle(a, b, c, d):
     array_type = ctypes.c_double * 2
     res = _shewchuk.incircle(

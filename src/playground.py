@@ -7,59 +7,69 @@ from math import floor
 from labyrinth import Labyrinth
 from PIL import Image, ImageDraw, ImageOps
 
-n = 1000
+n = 10
 lab = Labyrinth(n)
-#points = points_circular(n, n // 2, n // 2, 42)
+# points = points_circular(n, n // 2, n // 2, 42)
 print(f"n={len(lab.rooms)}")
 d = PlanarGraph(lab.room_centers)
-#d = PlanarGraph(points)
+# d = PlanarGraph(points)
 d.run()
-#exit()
+# exit()
 extrema = d.extreme_vertices()
-max_width = extrema["max_x"][0] + lab.max_width
-max_height = extrema["max_y"][1] + lab.max_height
-anti_alias = 1
+max_width = len(lab.room_squares[0])
+max_height = len(lab.room_squares)
+print(max_width, max_height)
 canvas_width = 2048
 canvas_height = 2048
-scale =  anti_alias * canvas_width / max_height
-padding = floor(0.1 * canvas_width * anti_alias)
+print()
+padding = floor(0.1 * max_width)
 bg = "black"
 fg = "white"
 
-im = Image.new('RGB', (floor(anti_alias * canvas_width), floor(anti_alias * canvas_height)), color=bg)
+im = Image.new(
+    "RGB",
+    (int(max_width),int(max_height)),
+    color=bg,
+)
 
 
 draw = ImageDraw.Draw(im)
-for e in d.voronoi:
-    if e.length == float('inf'):
-        continue
-    org = tuple(map(lambda x: x*scale, e.org))
-    dest = tuple(map(lambda x: x*scale, e.dest))
-    draw.line((org,dest), fill='red', width=canvas_width // 1000)
-
+# for e in d.voronoi:
+#     if e.length == float("inf"):
+#         continue
+#     org = tuple(map(lambda x: x, e.org))
+#     dest = tuple(map(lambda x: x, e.dest))
+#     draw.line((org, dest), fill="red")
 
 
 for room in lab.rooms:
     p1 = room.corner_upper_left
     p2 = room.corner_lower_right
-    p1_x = p1[0]*scale
-    p1_y = p1[1]*scale
-    p2_x = p2[0]*scale
-    p2_y = p2[1]*scale
+    p1_x = p1[0]
+    p1_y = p1[1]
+    p2_x = p2[0]
+    p2_y = p2[1]
     draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill=fg, outline=None)
-corridors = [(x,y) for y, col in enumerate(lab.corridor_squares) for x, cor in enumerate(col) if cor]
+corridors = [
+    (x, y)
+    for y, col in enumerate(lab.corridor_squares)
+    for x, cor in enumerate(col)
+    if cor
+]
 for square in corridors:
     p1 = square
-    p2 = (square[0] + 1, square[1] + 1)
-    p1_x = p1[0]*scale
-    p1_y = p1[1]*scale
-    p2_x = p2[0]*scale
-    p2_y = p2[1]*scale
-    draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill="blue", outline=None, width=canvas_width // 50)
+    p2 = (square[0], square[1])
+    p1_x = p1[0]
+    p1_y = p1[1]
+    p2_x = p2[0]
+    p2_y = p2[1]
+    draw.rectangle(
+        [p1_x, p1_y, p2_x, p2_y], fill="blue", outline=None
+    )
 
 
 im = ImageOps.expand(im, border=padding, fill=bg)
-#im = im.resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
+im = im.resize((canvas_width, canvas_height), Image.Resampling.NEAREST)
 
 
 im.show()

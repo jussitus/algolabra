@@ -1,7 +1,4 @@
-
-
-"""
-ideioita:
+"""ideioita:
 - incircle epätosi kaikille pisteille joka kolmiolle (determinantti sympylla? niin on eri kuin käytössä oleva incircle testi)
 - käy läpi sivut ja varmista että kärkiä sama määrä kuin syötteessä
 - jos len(delaunay.hull) = k niin kolmioita 2n - 2 - k ja sivuja 3n - 3 - k
@@ -9,11 +6,13 @@ ideioita:
 - ...
 
 """
+
 from sympy import Matrix
 import pytest
 from point_generation import points_circular
 from delaunay import PlanarGraph
 from condition import incircle
+
 N_SMALL = 100
 N_MEDIUM = 1000
 N_LARGE = 10000
@@ -21,11 +20,13 @@ POINTS_SMALL = points_circular(N_SMALL, N_SMALL // 2, N_SMALL // 2, 42)
 POINTS_MEDIUM = points_circular(N_MEDIUM, N_MEDIUM // 2, N_MEDIUM // 2, 42)
 POINTS_LARGE = points_circular(N_LARGE, N_LARGE // 2, N_LARGE // 2, 42)
 
+
 @pytest.fixture
 def graph_small() -> PlanarGraph:
     graph = PlanarGraph(POINTS_SMALL)
     graph.run()
     return graph
+
 
 @pytest.fixture
 def graph_medium() -> PlanarGraph:
@@ -33,13 +34,15 @@ def graph_medium() -> PlanarGraph:
     graph.run()
     return graph
 
+
 @pytest.fixture
 def graph_large() -> PlanarGraph:
     graph = PlanarGraph(POINTS_LARGE)
     graph.run()
     return graph
 
-def slow_incircle(a,b,c,d) -> bool:
+
+def slow_incircle(a, b, c, d) -> bool:
     matrix = Matrix(
         [
             [a[0], a[1], (a[0]) ** 2 + (a[1]) ** 2, 1],
@@ -58,7 +61,10 @@ def test_delaunay_condition_independent(graph_small):
         triangle_vertices = [v.org for v in t]
         for v in graph.vertices:
             if v not in triangle_vertices:
-                assert not incircle(triangle_vertices[0], triangle_vertices[1], triangle_vertices[2], v)
+                assert not incircle(
+                    triangle_vertices[0], triangle_vertices[1], triangle_vertices[2], v
+                )
+
 
 def test_delaunay_condition_dependent(graph_medium):
     graph = graph_medium
@@ -66,19 +72,24 @@ def test_delaunay_condition_dependent(graph_medium):
         triangle_vertices = [v.org for v in t]
         for v in graph.vertices:
             if v not in triangle_vertices:
-                assert not incircle(triangle_vertices[0], triangle_vertices[1], triangle_vertices[2], v)
+                assert not incircle(
+                    triangle_vertices[0], triangle_vertices[1], triangle_vertices[2], v
+                )
+
 
 def test_delaunay_correct_number_of_edges(graph_large):
     k = len(graph_large.hull)
     n = len(graph_large.vertices)
-    edges = 4 * (3*n - 3 - k)
+    edges = 4 * (3 * n - 3 - k)
     assert len(graph_large.edges) == edges
+
 
 def test_delaunay_correct_number_of_triangles(graph_large):
     k = len(graph_large.hull)
     n = len(graph_large.vertices)
-    triangles = (2*n - 2 - k)
+    triangles = 2 * n - 2 - k
     assert len(graph_large.triangles) == triangles
+
 
 def test_each_hull_edge_in_only_one_triangle(graph_large):
     graph = graph_large

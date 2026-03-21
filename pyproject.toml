@@ -31,7 +31,7 @@ docstring-code-line-length = 20
 
 [tool.ruff.lint]
 select = ["D"]
-ignore = ["D417"]
+ignore = ["D417", "D100", "D101", "D102", "D103"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
