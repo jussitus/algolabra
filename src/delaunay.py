@@ -169,7 +169,7 @@ def _voronoi(triangles: list[list[Edge]], hull: list[Edge]) -> list[Edge]:
         for e in t:
             vo = e.rot
             if e not in hull:
-                org, r_sym = circumcircle(e.sym)
+                vo.org, r_sym = circumcircle(e.sym)
                 vo.sym.radius = r_sym
             else:
                 vo.org = (float("inf"), float("inf"))
