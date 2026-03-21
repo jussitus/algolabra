@@ -16,7 +16,7 @@ from condition import (
     left_of,
     valid,
 )
-
+from point import Point
 
 class Delaunay:
     """Class representing a planar graph.
@@ -40,9 +40,15 @@ class Delaunay:
     @property
     def vertices(self) -> list[tuple[int | float, int | float]]:
         """Vertices of the graph."""
-
         return self._vertices
 
+    def extreme_vertices(self) -> dict[str, Point]:
+        """A dict of the extreme left, right, bottom, and top vertices."""
+        min_x = self.vertices[0]
+        max_x = self.vertices[-1]
+        min_y = min(self.vertices, key=(lambda v: v[1]))
+        max_y = max(self.vertices, key=(lambda v: v[1]))
+        return {"min_x": min_x, "max_x": max_x, "min_y": min_y, "max_y": max_y}
     @property
     def edges(self) -> list[Edge]:
         """Edges of the graph, including all of the four edges of a quad-edge."""
@@ -54,7 +60,6 @@ class Delaunay:
 
         The left edge's origin is the leftmost vertex of the graph. It is a hull edge in the counterclockwise direction.
         """
-
         return self._left
 
     @property
@@ -71,7 +76,6 @@ class Delaunay:
 
         Each triangle is a list of three edges in the counterclockwise direction. The list of triangles is populated the first time this property is accessed.
         """
-
         if len(self._triangles) > 0 or self.left is None:
             return self._triangles
         triangles = []
@@ -89,7 +93,6 @@ class Delaunay:
 
         The list is populated the first time this property is accessed.
         """
-
         if len(self._hull) > 0 or self.left is None:
             return self._hull
         hull = [self.left]
@@ -104,19 +107,16 @@ class Delaunay:
     @property
     def delaunay(self) -> list[Edge]:
         """Edges in the Delaunay triangulation, without their symmetric (Sym) edges."""
-
         return self._delaunay
 
     @property
     def voronoi(self) -> list[Edge]:
         """Edges in the Voronoi diagram, without their symmetric (Sym) edges."""
-
         return self._voronoi
 
     @property
     def mst_delaunay(self) -> list[Edge]:
         """Edges in the minimum spanning tree of the Delaunay triangulation."""
-
         return self._mst_delaunay
 
     def run_prim(self, graph: list[Edge]) -> list[Edge]:
@@ -197,6 +197,7 @@ class Delaunay:
 
 
 def _delaunay(s, edges, bad_edges):
+    """docstring to-do"""
     if len(s) < 2:
         raise ValueError(f"len(s)={len(s)} is less than 2")
     if len(s) == 2:

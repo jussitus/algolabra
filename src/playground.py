@@ -1,53 +1,60 @@
 from delaunay import Delaunay
-from edge import circumcircles
 import random
-import networkx as nx
-import matplotlib.pyplot as plt
 from point_generation import points_random, points_circular, points_circular_unit
-import matplotlib.pyplot as plt
 from condition import ccw
 from time import time
-from math import log
+from math import floor
 from room_generation import Labyrinth
+from PIL import Image, ImageDraw, ImageOps
 
-
-n = 25
+n = 100
 lab = Labyrinth(n)
 print(f"n={len(lab.rooms)}")
 d = Delaunay(lab.room_centers)
 d.run()
+extrema = d.extreme_vertices()
+max_width = extrema["max_x"][0] + lab.max_width
 
-P = nx.Graph()
-for e in d.mst_delaunay:
-    P.add_edge(e.org, e.dest)
-pos_p = {node: node for node in P.nodes()}
-nx.draw(
-    P,
-    pos_p,
-    with_labels=False,
-    edge_color="red",
-    node_color="red",
-    node_size=0,
-)
+anti_alias = 8
+canvas_width = 1024
+canvas_height = 1024
+scale =  anti_alias * canvas_width / max_width
+padding = floor(0.1 * canvas_width * anti_alias)
+bg = "black"
+fg = "white"
+
+im = Image.new('RGB', (floor(anti_alias * canvas_width), floor(anti_alias * canvas_height)), color=bg)
 
 
-L = nx.Graph()
+draw = ImageDraw.Draw(im)
+for e in d.voronoi:
+    if e.length == float('inf'):
+        continue
+    org = tuple(map(lambda x: x*scale, e.org))
+    dest = tuple(map(lambda x: x*scale, e.dest))
+    draw.line((org,dest), fill='red', width=canvas_width // 100)
+
+
+
 for room in lab.rooms:
-    L.add_edge(room.corner_upper_left, room.corner_upper_right)
-    L.add_edge(room.corner_lower_left, room.corner_lower_right)
-    L.add_edge(room.corner_upper_left, room.corner_lower_left)
-    L.add_edge(room.corner_upper_right, room.corner_lower_right)
+    p1 = room.corner_upper_left
+    p2 = room.corner_lower_right
+    p1_x = p1[0]*scale
+    p1_y = p1[1]*scale
+    p2_x = p2[0]*scale
+    p2_y = p2[1]*scale
+    draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill=fg, outline=None, width=canvas_width // 50)
+corridors = [(x,y) for y, col in enumerate(lab.corridor_squares) for x, cor in enumerate(col) if cor]
+for square in corridors:
+    p1 = square
+    p2 = (square[0] + 1, square[1] + 1)
+    p1_x = p1[0]*scale
+    p1_y = p1[1]*scale
+    p2_x = p2[0]*scale
+    p2_y = p2[1]*scale
+    draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill=fg, outline=None, width=canvas_width // 50)
+im = ImageOps.expand(im, border=padding, fill=bg)
+im = im.resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
 
-pos_l = {node: node for node in L.nodes()}
 
-nx.draw(
-    L,
-    pos_l,
-    with_labels=False,
-    edge_color="black",
-    node_color="black",
-    node_size=0,
-)
-ax = plt.gca()
-ax.set_aspect("equal", adjustable="datalim")
-plt.show()
+im.show()

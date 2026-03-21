@@ -1,61 +1,94 @@
 from math import sqrt
 from condition import ccw
-
-Point = tuple[int | float, int | float]
+from point import Point
 
 
 class Edge:
-    """Delaunay triangulaation peruspalikka, placeholder"""
+    """Class representing a single directed component of a quad-edge.
+
+    In this code 'edge' always refers to one edge component of a quad-edge. The `Edge` class does not implement faces (left, right) or orientation (flip). Face information is encoded in the mathematical structure, however.
+
+    Attributes:
+        `org`: A tuple representing the x,y coordinates of the origin of the edge.
+        `onext`: The next edge with the same origin (`org`) in the counterclockwise (CCW) direction. These form a ring and repeated invocations of onext will eventually lead back to the same edge.
+        `sym`: The symmetric edge, which is the same as the original edge with origin (`org`) and destination (`dest`) swapped.
+        `rot`: The edge rotated 90 degrees counterclockwise (CCW). Part of the Voronoi diagram.
+        `tor`: The edge rotated 90 degrees clockwise (CW). Same as `self.tor.sym`. Part of the Voronoi diagram.
+        `dual`: A boolean indicating if the edge is in the Voronoi diagram. Note that the actual dual is the flipped version, but flip is not implemented.
+        `radius`: The radius of the circumcircle centered on `org`. Only defined for Voronoi edges.
+    """
 
     __slots__ = [
         "org",
-        "sym",
         "onext",
+        "sym",
         "rot",
         "tor",
         "dual",
-        "data",
         "radius",
         "_length",
     ]
 
     def __init__(self):
+        """Initializes the instance.
+
+        Edges are only created in fours by the function `make_quad_edge`, so `self.org`, `self.sym`, `self.rot` and `self.tor` are never None after creation.
+
+        """
         self.org: Point = None  # type: ignore
         self.sym: Edge = None  # type: ignore
         self.onext: Edge = self
         self.rot: Edge = None  # type: ignore
         self.tor: Edge = None  # type: ignore
         self.dual: bool = False
-        self.data = None
         self.radius: float | None = None
         self._length: float | None = None
 
     @property
-    def lnext(self):
+    def lnext(self) -> "Edge":
+        """The next edge with the same left face (`self.tor.onext.rot`) when moving counterclockwise (CCW) around the face."""
         return self.tor.onext.rot
 
     @property
-    def rnext(self):
+    def rnext(self) -> "Edge":
+        """The next edge with the same right face (`self.rot.onext.tor`) when moving counterclockwise (CCW) around the face."""
         return self.rot.onext.tor
 
     @property
-    def dnext(self):
+    def dnext(self) -> "Edge":
+        """The next edge with the same destination (`self.dest`) when moving counterclockwise (CCW) around the right face.
+
+        Same as `self.sym.onext.sym`.
+        """
         return self.sym.onext.sym
 
     @property
-    def dest(self):
+    def dest(self) -> Point:
+        """The destination of the edge, which is the origin of the symmetric edge (`self.sym.org`)."""
         return self.sym.org
 
     @property
-    def oprev(self):
+    def oprev(self) -> "Edge":
+        """The previous edge with the same origin (`org`) in the counterclockwise (CCW) direction.
+
+        Note: It is the _previous_ edge. It is the next edge in the clockwise (CW) direction. These form a ring and repeated invocations of oprev will eventually lead back to the same edge. Same as `self.rot.onext.rot`.
+        """
         return self.rot.onext.rot
 
     @property
-    def rprev(self):
+    def rprev(self) -> "Edge":
+        """The previous edge with the same right face (`self.sym.onext`) when moving counterclockwise (CCW) around the face.
+
+        Note: It is the _previous_ edge. It is the next edge when moving clockwise (CW) around the face.
+        """
         return self.sym.onext
 
     @property
-    def length(self):
+    def length(self) -> float:
+        """Length of the edge.
+
+        Calculated when first accessed. Can be `float('inf')` for outer Voronoi edges.
+        """
         if self._length is None:
             if self.org is not None and self.dest is not None:
                 self._length = sqrt(
@@ -66,15 +99,17 @@ class Edge:
                 return float("inf")  # infinite voronoi edge
         return self._length
 
-    def __str__(self):
-        string = f"org={self.org}, dest={self.dest}, length={self.length}"
+    def __str__(self) -> str:
+        string = f"Edge({self.org} -> {self.dest})"
         return string
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
+        """Compares the lengths of the edges."""
         return self.length < other.length
 
 
-def make_quad_edge(org, dest):
+def make_quad_edge(org, dest) -> Edge:
+    """doc string to do"""
     e = Edge()
     e_sym = Edge()
     e_rot = Edge()
@@ -111,7 +146,8 @@ def make_quad_edge(org, dest):
     return e
 
 
-def splice(a, b):
+def splice(a: Edge, b: Edge):
+    """docstring to do"""
     alpha = a.onext.rot
     beta = b.onext.rot
 
@@ -119,27 +155,32 @@ def splice(a, b):
     a.onext, b.onext = b.onext, a.onext
 
 
-def connect(a, b) -> Edge:
+def connect(a: Edge, b: Edge) -> Edge:
+    """docstring to do"""
     e = make_quad_edge(a.dest, b.org)
     splice(e, a.lnext)
     splice(e.sym, b)
     return e
 
 
-def delete_quad_edge(e):
+def delete_quad_edge(e: Edge):
+    """docstring to do"""
     splice(e, e.oprev)
     splice(e.sym, e.sym.oprev)
 
 
 def triangle_ccw(e: Edge) -> tuple[Edge, Edge, Edge]:
+    """docstring to do"""
     return (e, e.lnext, e.lnext.lnext)
 
 
 def triangle_cw(e: Edge) -> tuple[Edge, Edge, Edge]:
+    """docstring to do"""
     return (e, e.rnext, e.rnext.rnext)
 
 
-def circumcircle(e: Edge):
+def circumcircle(e: Edge) -> tuple[Point, float]:
+    """docstring to do"""
     a, b, c = triangle_ccw(e)
     d = 2 * (
         a.org[0] * (b.org[1] - c.org[1])
@@ -158,11 +199,3 @@ def circumcircle(e: Edge):
     )
     r = sqrt((a.org[0] - x) ** 2 + (a.org[1] - y) ** 2)
     return (x, y), r
-
-
-def circumcircles(edges: list[Edge]):
-    ccs = set()
-    for e in edges:
-        if ccw(e.org, e.dest, e.lnext.dest):
-            ccs.add(circumcircle(e))
-    return ccs

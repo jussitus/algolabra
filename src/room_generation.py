@@ -1,31 +1,42 @@
 from random import randint, seed
 from math import sqrt, floor
-
-
+import heapq as hq
+from delaunay import Delaunay
+from point import Point
 class Room:
     def __init__(self, corner, width, height):
-        self.corner_upper_left = corner
+        self.corner_upper_left: Point = corner
         self.corner_lower_left = (corner[0], corner[1] + height)
         self.corner_upper_right = (corner[0] + width, corner[1])
         self.corner_lower_right = (corner[0] + width, corner[1] + height)
         self.width = width
         self.height = height
         self.center = (corner[0] + width // 2, corner[1] + height // 2)
+        self.connected = False
 
 
 class Labyrinth:
     def __init__(self, max_rooms):
-        self.corridor_squares = []
         self.max_width = max(5, floor(sqrt(max_rooms)))
         self.max_height = max(5, floor(sqrt(max_rooms)))
-        self.min_width = max(2, self.max_width // 3)
-        self.min_height = max(2, self.max_height // 3)
+        self.min_width = 2 #max(2, self.max_width // 3)
+        self.min_height = 2 #max(2, self.max_height // 3)
         self.gap = 1
-        self.sparsity = 3.5 * (self.max_width) / max_rooms
-        self.max_tries = max_rooms**2
-        self.rooms, self.room_squares, self.room_centers = self.generate_rooms(
+        self.sparsity = 1 * (self.max_width) / max_rooms
+        self.max_tries = max(max_rooms, 1000)
+        rooms, room_squares, room_centers = self.generate_rooms(
             max_rooms
         )
+        self.rooms: list[Room] = rooms
+        self.room_squares = room_squares
+        self.room_centers = room_centers
+        self.corridor_squares = [[False]*len(self.room_squares) for _ in range(len(self.room_squares))]
+        self.connections = self.connect_rooms(self.room_centers)
+        self.create_corridors()
+
+
+    def get_room_of_square(self, square: Point):
+        return self.room_squares[square[1]][square[0]] # type: ignore
 
     def generate_rooms(self, n):
         rooms = []
@@ -36,6 +47,7 @@ class Labyrinth:
         occupied = [[False] * (total_x + gap) for _ in range(total_y + gap)]
         room_squares = [[None] * (total_x + gap) for _ in range(total_y + gap)]
         tries = 0
+        #seed(42)
         while len(rooms) < n:
             if tries == self.max_tries:
                 print(f"Could not fit any more rooms in {self.max_tries} tries")
@@ -57,13 +69,73 @@ class Labyrinth:
             tries = 0
             # print(f"creating room {n}: corner={corner}, width={width}, height={height}")
             room = Room(corner, width + 1, height + 1)
-            for w in range(width + gap):
-                for h in range(height + gap):
+            for w in range(width+gap):
+                for h in range(height+gap):
                     occupied[corner[1] + h][corner[0] + w] = True
-                    room_squares[corner[1] + h][corner[0] + w] = room
+                    if w <= width and h <= height:
+                        room_squares[corner[1] + h][corner[0] + w] = room
             rooms.append(room)
             room_centers.append(room.center)
         return rooms, room_squares, room_centers
+
+    def connect_rooms(self, room_centers):
+        d = Delaunay(room_centers)
+        d.run()
+        return d.mst_delaunay
+        
+
+    def create_corridors(self):
+        def manhattan(a, b):
+            return abs(a[0] - b[0]) + abs(a[1] - b[1])
+            #return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+        def neighbors(square):
+            squares = []
+            if square[1] + 1 < len(self.room_squares):
+                up = (square[0], square[1] + 1)
+                squares.append(up)
+            if square[1] - 1 < len(self.room_squares):    
+                down = (square[0], square[1] - 1)
+                squares.append(down)
+            if square[0] - 1 < len(self.room_squares[0]):
+                left = (square[0] - 1, square[1])
+                squares.append(left)
+            if square[0] + 1 < len(self.room_squares[0]):    
+                right = (square[0] + 1, square[1])
+                squares.append(right)
+            return squares
+        def find_path(start,end):
+            heap = []
+            visited = [[False]*len(self.room_squares) for _ in range(len(self.room_squares))]
+            first = (manhattan(start,goal), start, None)
+            visited[first[1][1]][first[1][0]] = True
+            hq.heappush(heap, first)
+            while True:
+                current = hq.heappop(heap)
+                for neighbor in neighbors(current[1]):
+                    #print(f"width={len(self.room_squares[0])}, height={len(self.room_squares)}, current={neighbor}")
+                    room_in_square = self.room_squares[neighbor[1]][neighbor[0]]
+                    if (room_in_square is not None and (room_in_square.center == goal)):
+                        return current
+                    if not visited[neighbor[1]][neighbor[0]]:
+                        if not self.corridor_squares[neighbor[1]][neighbor[0]] and not room_in_square :
+                            visited[neighbor[1]][neighbor[0]] = True
+                            hq.heappush(heap, (manhattan(neighbor,goal) + current[0], neighbor, current))
+                        else:
+                            visited[neighbor[1]][neighbor[0]] = True
+                            hq.heappush(heap, (current[0], neighbor, current))
+
+
+        for edge in self.connections:
+            r1 = self.get_room_of_square(edge.org)
+            r2 = self.get_room_of_square(edge.dest)
+            start = r1.center
+            goal = r2.center
+            path = find_path(start, goal)
+            prev = path
+            while prev[2] is not None:
+                if self.get_room_of_square(prev[1])is None:
+                    self.corridor_squares[prev[1][1]][prev[1][0]] = True
+                prev = prev[2]
 
 
 def point_in_circle(max_x: int, max_y: int):

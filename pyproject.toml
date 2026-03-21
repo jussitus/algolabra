@@ -9,8 +9,7 @@ license = {text = "GPL-2.0-only"}
 readme = "README.md"
 requires-python = "~=3.13.0"
 dependencies = [
-    "networkx (>=3.6.1,<4.0.0)",
-    "matplotlib (>=3.10.8,<4.0.0)",
+    "pillow (>=12.1.1,<13.0.0)"
 ]
 
 
@@ -23,3 +22,14 @@ dev = [
     "pylint (>=4.0.5,<5.0.0)",
     "pytest (>=9.0.2,<10.0.0)"
 ]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 20
+
+[tool.ruff.lint]
+select = ["D"]
+ignore = ["D417"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
