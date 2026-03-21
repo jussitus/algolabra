@@ -1,4 +1,6 @@
 from math import sqrt
+from time import time
+from tqdm import tqdm
 import heapq as hq
 from edge import (
     Edge,
@@ -185,15 +187,20 @@ class Delaunay:
 
     def run(self):
         """Computes the graph's Delaunay triangulation, coordinates of the Voronoi edges, and the minimum spanning tree of the Delaunay triangulation."""
+        print("Started triangulating.")
+        start = time()
         self._left, self._right, self._edges = self.run_delaunay(self.vertices)
+        end = time()
+        print(f"Triangulated in {end-start}")
         self.run_voronoi(self.triangles)
-
+        print("Voronoi done.")
         for e in self.edges:
             if not e.dual and e.org < e.dest:
                 self._delaunay.append(e)
                 self._voronoi.append(e.rot)
 
         self._mst_delaunay = self.run_prim(self._delaunay)
+        print("MST done.")
 
 
 def _delaunay(s, edges, bad_edges):

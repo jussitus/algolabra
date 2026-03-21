@@ -1,6 +1,7 @@
 from random import randint, seed
 from math import sqrt, floor
 import heapq as hq
+from tqdm import tqdm
 from delaunay import Delaunay
 from point import Point
 class Room:
@@ -17,13 +18,14 @@ class Room:
 
 class Labyrinth:
     def __init__(self, max_rooms):
-        self.max_width = max(5, floor(sqrt(max_rooms)))
-        self.max_height = max(5, floor(sqrt(max_rooms)))
-        self.min_width = 2 #max(2, self.max_width // 3)
-        self.min_height = 2 #max(2, self.max_height // 3)
-        self.gap = 1
-        self.sparsity = 1 * (self.max_width) / max_rooms
-        self.max_tries = max(max_rooms, 1000)
+        self.max_rooms = max_rooms
+        self.max_width = 5 #max(5, floor(sqrt(max_rooms)))
+        self.max_height = 5 #max(5, floor(sqrt(max_rooms)))
+        self.min_width = max(2, self.max_width // 3)
+        self.min_height = max(2, self.max_height // 3)
+        self.gap = 2
+        self.sparsity = 0.5 * (self.max_width) / max_rooms
+        self.max_tries = 100
         rooms, room_squares, room_centers = self.generate_rooms(
             max_rooms
         )
@@ -47,11 +49,12 @@ class Labyrinth:
         occupied = [[False] * (total_x + gap) for _ in range(total_y + gap)]
         room_squares = [[None] * (total_x + gap) for _ in range(total_y + gap)]
         tries = 0
-        #seed(42)
+        seed(42)
         while len(rooms) < n:
             if tries == self.max_tries:
-                print(f"Could not fit any more rooms in {self.max_tries} tries")
-                break
+                print(f"Could not fit any more rooms in {self.max_tries} tries. Trying more sparse layout...")
+                self.sparsity *= 1.05
+                return self.generate_rooms(self.max_rooms)
             valid = True
             corner = point_in_circle(
                 total_x - self.max_width - 1, total_y - self.max_height - 1
@@ -86,20 +89,23 @@ class Labyrinth:
 
     def create_corridors(self):
         def manhattan(a, b):
-            return abs(a[0] - b[0]) + abs(a[1] - b[1])
+            #return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+            return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
+            #return abs(a[0] - b[0]) + abs(a[1] - b[1])
             #return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
         def neighbors(square):
             squares = []
-            if square[1] + 1 < len(self.room_squares):
+            i = 1
+            if square[1] + i < len(self.room_squares):
                 up = (square[0], square[1] + 1)
                 squares.append(up)
-            if square[1] - 1 < len(self.room_squares):    
+            if square[1] - i < len(self.room_squares):    
                 down = (square[0], square[1] - 1)
                 squares.append(down)
-            if square[0] - 1 < len(self.room_squares[0]):
+            if square[0] - i < len(self.room_squares[0]):
                 left = (square[0] - 1, square[1])
                 squares.append(left)
-            if square[0] + 1 < len(self.room_squares[0]):    
+            if square[0] + i < len(self.room_squares[0]):    
                 right = (square[0] + 1, square[1])
                 squares.append(right)
             return squares
@@ -111,21 +117,23 @@ class Labyrinth:
             hq.heappush(heap, first)
             while True:
                 current = hq.heappop(heap)
+                #print(current)
                 for neighbor in neighbors(current[1]):
                     #print(f"width={len(self.room_squares[0])}, height={len(self.room_squares)}, current={neighbor}")
                     room_in_square = self.room_squares[neighbor[1]][neighbor[0]]
                     if (room_in_square is not None and (room_in_square.center == goal)):
                         return current
                     if not visited[neighbor[1]][neighbor[0]]:
-                        if not self.corridor_squares[neighbor[1]][neighbor[0]] and not room_in_square :
+                        if not self.corridor_squares[neighbor[1]][neighbor[0]]: # and not room_in_square
                             visited[neighbor[1]][neighbor[0]] = True
+                            #hq.heappush(heap, (manhattan(neighbor,goal), neighbor, current))
                             hq.heappush(heap, (manhattan(neighbor,goal) + current[0], neighbor, current))
                         else:
                             visited[neighbor[1]][neighbor[0]] = True
                             hq.heappush(heap, (current[0], neighbor, current))
 
 
-        for edge in self.connections:
+        for edge in tqdm(self.connections):
             r1 = self.get_room_of_square(edge.org)
             r2 = self.get_room_of_square(edge.dest)
             start = r1.center
