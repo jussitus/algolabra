@@ -7,7 +7,7 @@ from math import floor
 from room_generation import Labyrinth
 from PIL import Image, ImageDraw, ImageOps
 
-n = 10000
+n = 100
 lab = Labyrinth(n)
 #points = points_circular(n, 10000, 10000, 42)
 print(f"n={len(lab.rooms)}")

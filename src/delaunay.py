@@ -121,87 +121,97 @@ class Delaunay:
         """Edges in the minimum spanning tree of the Delaunay triangulation."""
         return self._mst_delaunay
 
-    def run_prim(self, graph: list[Edge]) -> list[Edge]:
-        """Calculates the minimum spanning tree of a graph using Prim's algorith.
-
-        Args:
-            graph: Edges of a Delaunay triangulation or a Voronoi diagram.
+    def compute_mst_delaunay(self) -> list[Edge]:
+        """Calculates the minimum spanning tree of a Delaunay triangulation.
 
         Returns:
             A list of the edges in the minimum spanning tree.
         """
-        visited = {}
-        mst = []
-        heap = []
-
-        first = graph[0]
-        hq.heappush(heap, first.sym)
-        visited[first.org] = True
-        current = first.onext
-        while first is not current:
-            hq.heappush(heap, current.sym)
-            current = current.onext
-        while len(heap) > 0:
-            first = hq.heappop(heap)
-            current = first.onext
-            while first is not current:
-                if not visited.get(current.dest, False):
-                    hq.heappush(heap, current.sym)
-                current = current.onext
-            if not visited.get(first.org, False):
-                mst.append(first)
-                visited[first.org] = True
-        return mst
-
-    def run_delaunay(self, vertices: list[tuple]):
+        return _prim(self.delaunay)
+    
+    def compute_delaunay(self):
         """Computes the Delaunay triangulation using the Guibas-Stolfi divide-and-conquer algorithm.
 
         Args:
             vertices: Vertices of the graph.
 
         Returns:
-            A tuple consisting of the left edge, the right edge, and a list of all edges in the Delaunay triangulation and the Voronoi diagram, and their symmetric counterparts.
+            A tuple consisting of the left edge, the right edge, the list of all edges (including symmetric), and a list of Delaunay edges (excluding symmetric).
         """
         left, right, bad_edges = _delaunay(self._vertices, self._edges, [])
         edges = list(set(self.edges) - set(bad_edges))
-        return left, right, edges
+        delaunay_edges = []
+        for e in edges:
+            if not e.dual and e.org < e.dest:
+                delaunay_edges.append(e)
+        return left, right, edges, delaunay_edges
 
-    def run_voronoi(self, triangles):
-        """Computes the origin (org) and destination (dest) coordinates of the Voronoi edges, and the radius of the circumcircle of centered around the origin.
+    def compute_voronoi(self):
+        """REDO DOCSTRING Computes the origin (org) and destination (dest) coordinates of the Voronoi edges, and the radius of the circumcircle of centered around the origin.
 
         The outer edges of the Voronoi diagram extend to infinity, which is treated as a single point.
         """
-        for t in triangles:
-            for e in t:
-                vo = e.rot
-
-                if e not in self.hull:
-                    org, r_sym = circumcircle(e.sym)
-                    vo.sym.radius = r_sym
-                else:
-                    vo.org = (float("inf"), float("inf"))
-
-                vo.sym.org, r = circumcircle(e)
-                vo.radius = r
-                vo.sym.radius = r
+        return _voronoi(self.triangles, self.hull)
 
     def run(self):
         """Computes the graph's Delaunay triangulation, coordinates of the Voronoi edges, and the minimum spanning tree of the Delaunay triangulation."""
         print("Started triangulating.")
-        start = time()
-        self._left, self._right, self._edges = self.run_delaunay(self.vertices)
-        end = time()
-        print(f"Triangulated in {end-start}")
-        self.run_voronoi(self.triangles)
-        print("Voronoi done.")
-        for e in self.edges:
-            if not e.dual and e.org < e.dest:
-                self._delaunay.append(e)
-                self._voronoi.append(e.rot)
-
-        self._mst_delaunay = self.run_prim(self._delaunay)
+        self._left, self._right, self._edges, self._delaunay = self.compute_delaunay()
+        self._voronoi = self.compute_voronoi()
+        self._mst_delaunay = self.compute_mst_delaunay()
         print("MST done.")
 
+
+def _voronoi(triangles: list[list[Edge]], hull: list[Edge]) -> list[Edge]:
+    """docstring todo"""
+    voronoi_edges = []
+    for t in triangles:
+        for e in t:
+            vo = e.rot
+            if e not in hull:
+                org, r_sym = circumcircle(e.sym)
+                vo.sym.radius = r_sym
+            else:
+                vo.org = (float("inf"), float("inf"))
+
+            vo.sym.org, r = circumcircle(e)
+            vo.radius = r
+            vo.sym.radius = r
+            if vo.org < vo.dest:
+                voronoi_edges.append(vo)
+    return voronoi_edges
+
+def _prim(graph: list[Edge]) -> list[Edge]:
+    """Calculates the minimum spanning tree of a triangulated graph using Prim's algorith.
+
+    Args:
+        graph: Edges of a Delaunay triangulation or a Voronoi diagram.
+
+    Returns:
+        A list of the edges in the minimum spanning tree.
+    """
+    visited = {}
+    mst = []
+    heap = []
+
+    first = graph[0]
+    hq.heappush(heap, first.sym)
+    visited[first.org] = True
+    current = first.onext
+    while first is not current:
+        hq.heappush(heap, current.sym)
+        current = current.onext
+    while len(heap) > 0:
+        first = hq.heappop(heap)
+        current = first.onext
+        while first is not current:
+            if not visited.get(current.dest, False):
+                hq.heappush(heap, current.sym)
+            current = current.onext
+        if not visited.get(first.org, False):
+            mst.append(first)
+            visited[first.org] = True
+    return mst
 
 def _delaunay(s, edges, bad_edges):
     """docstring to-do"""
