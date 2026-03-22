@@ -1,6 +1,5 @@
 from math import sqrt
 from time import time
-from tqdm import tqdm
 import heapq as hq
 from edge import (
     Edge,

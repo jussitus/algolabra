@@ -4,7 +4,7 @@ from point_generation import points_random, points_circular, points_circular_uni
 from condition import ccw
 from time import time
 from math import floor
-from labyrinth import Labyrinth
+from labyrinth2 import Labyrinth
 from PIL import Image, ImageDraw, ImageOps
 
 n = 10
@@ -28,44 +28,43 @@ fg = "white"
 
 im = Image.new(
     "RGB",
-    (int(max_width),int(max_height)),
+    (int(canvas_width),int(canvas_width)),
     color=bg,
 )
 
 
 draw = ImageDraw.Draw(im)
-# for e in d.voronoi:
-#     if e.length == float("inf"):
-#         continue
-#     org = tuple(map(lambda x: x, e.org))
-#     dest = tuple(map(lambda x: x, e.dest))
-#     draw.line((org, dest), fill="red")
-
-
 for room in lab.rooms:
-    p1 = room.corner_upper_left
-    p2 = room.corner_lower_right
-    p1_x = p1[0]
-    p1_y = p1[1]
-    p2_x = p2[0]
-    p2_y = p2[1]
-    draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill=fg, outline=None)
-corridors = [
-    (x, y)
-    for y, col in enumerate(lab.corridor_squares)
-    for x, cor in enumerate(col)
-    if cor
-]
-for square in corridors:
-    p1 = square
-    p2 = (square[0], square[1])
-    p1_x = p1[0]
-    p1_y = p1[1]
-    p2_x = p2[0]
-    p2_y = p2[1]
-    draw.rectangle(
-        [p1_x, p1_y, p2_x, p2_y], fill="blue", outline=None
-    )
+    for e in room.edges:
+        org = tuple(map(lambda x: x, e.org))
+        dest = tuple(map(lambda x: x, e.dest))
+        draw.line((org, dest), fill="red", width=1)
+
+
+# for room in lab.rooms:
+#     p1 = room.corner_upper_left
+#     p2 = room.corner_lower_right
+#     p1_x = p1[0]
+#     p1_y = p1[1]
+#     p2_x = p2[0]
+#     p2_y = p2[1]
+#     draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill=fg, outline=None)
+# corridors = [
+#     (x, y)
+#     for y, col in enumerate(lab.corridor_squares)
+#     for x, cor in enumerate(col)
+#     if cor
+# ]
+# for square in corridors:
+#     p1 = square
+#     p2 = (square[0], square[1])
+#     p1_x = p1[0]
+#     p1_y = p1[1]
+#     p2_x = p2[0]
+#     p2_y = p2[1]
+#     draw.rectangle(
+#         [p1_x, p1_y, p2_x, p2_y], fill="blue", outline=None
+#     )
 
 
 im = ImageOps.expand(im, border=padding, fill=bg)
