@@ -27,6 +27,7 @@ class Edge:
         "dual",
         "radius",
         "_length",
+        "data"
     ]
 
     def __init__(self):
@@ -43,6 +44,7 @@ class Edge:
         self.dual: bool = False
         self.radius: float | None = None
         self._length: float | None = None
+        self.data = None
 
     @property
     def lnext(self) -> "Edge":

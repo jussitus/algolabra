@@ -10,12 +10,12 @@ from point import Point
 
 class Room:
     def __init__(self, corner, width, height):
-        self.width = width - 1
-        self.height = height - 1
         self.corner_upper_left: Point = corner
         self.corner_lower_left = (corner[0], corner[1] + height)
         self.corner_upper_right = (corner[0] + width, corner[1])
         self.corner_lower_right = (corner[0] + width, corner[1] + height)
+        self.width = width
+        self.height = height
         self.center = (corner[0] + width // 2, corner[1] + height // 2)
         self.connected = False
 
@@ -125,7 +125,7 @@ class Labyrinth:
                 current = hq.heappop(heap)
                 # print(current)
                 for neighbor in neighbors(current[1]):
-                    print(f"width={len(self.room_squares[0])}, height={len(self.room_squares)}, current={neighbor}")
+                    # print(f"width={len(self.room_squares[0])}, height={len(self.room_squares)}, current={neighbor}")
                     room_in_square = self.room_squares[neighbor[1]][neighbor[0]]
                     if room_in_square is not None and (room_in_square.center == goal):
                         return current
