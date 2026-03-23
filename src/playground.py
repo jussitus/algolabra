@@ -4,71 +4,47 @@ from point_generation import points_random, points_circular, points_circular_uni
 from condition import ccw
 from time import time
 from math import floor
-from labyrinth2 import Labyrinth
-from PIL import Image, ImageDraw, ImageOps
+from labyrinth import Labyrinth
+from collections import Counter
+import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection, PolyCollection
 
-n = 10
-lab = Labyrinth(n)
+n = 250
+lab = Labyrinth(n, 1)
 # points = points_circular(n, n // 2, n // 2, 42)
-print(f"n={len(lab.rooms)}")
-d = PlanarGraph(lab.room_centers)
+# print(f"n={len(lab.rooms)}")
+# d = PlanarGraph(lab.room_centers)
 # d = PlanarGraph(points)
-d.run()
+# d.run()
 # exit()
-extrema = d.extreme_vertices()
-max_width = len(lab.room_squares[0])
-max_height = len(lab.room_squares)
-print(max_width, max_height)
-canvas_width = 2048
-canvas_height = 2048
-print()
-padding = floor(0.1 * max_width)
-bg = "black"
-fg = "white"
 
-im = Image.new(
-    "RGB",
-    (int(canvas_width),int(canvas_width)),
-    color=bg,
-)
-
-
-draw = ImageDraw.Draw(im)
+rectangles = []
 for room in lab.rooms:
-    for e in room.edges:
-        org = tuple(map(lambda x: x, e.org))
-        dest = tuple(map(lambda x: x, e.dest))
-        draw.line((org, dest), fill="red", width=1)
+    room_edges = [e.org for e in room.edges]
+    room_edges.append(room.edges[-1].dest)
+    rectangles.append(room_edges)
+
+for room in lab.corridors:
+    room_edges = [e.org for e in room.edges]
+    room_edges.append(room.edges[-1].dest)
+    rectangles.append(room_edges)
 
 
-# for room in lab.rooms:
-#     p1 = room.corner_upper_left
-#     p2 = room.corner_lower_right
-#     p1_x = p1[0]
-#     p1_y = p1[1]
-#     p2_x = p2[0]
-#     p2_y = p2[1]
-#     draw.rectangle([p1_x, p1_y, p2_x, p2_y], fill=fg, outline=None)
-# corridors = [
-#     (x, y)
-#     for y, col in enumerate(lab.corridor_squares)
-#     for x, cor in enumerate(col)
-#     if cor
-# ]
-# for square in corridors:
-#     p1 = square
-#     p2 = (square[0], square[1])
-#     p1_x = p1[0]
-#     p1_y = p1[1]
-#     p2_x = p2[0]
-#     p2_y = p2[1]
-#     draw.rectangle(
-#         [p1_x, p1_y, p2_x, p2_y], fill="blue", outline=None
-#     )
+
+# counts = Counter(tuple(sorted(x)) for x in edges)
+# edges = [x for x in edges if counts[tuple(sorted(x))] == 1]
+# print(edges[0])
+# vertices = [item for edge in edges for item in edge]
+# vertices = list(set(vertices))
+
+fig, ax = plt.subplots()
+ax.axis('equal')
+p = PolyCollection(rectangles, facecolors='blue', edgecolors='blue')
+l = LineCollection(rectangles, colors='black', linewidths=1.5)
+#ax.add_collection(p)
+ax.add_collection(l)
 
 
-im = ImageOps.expand(im, border=padding, fill=bg)
-im = im.resize((canvas_width, canvas_height), Image.Resampling.NEAREST)
+ax.autoscale()
 
-
-im.show()
+plt.show()
