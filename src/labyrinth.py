@@ -70,7 +70,7 @@ class Labyrinth:
         rooms = []
         room_centers = []
         total = floor(self.max_dim * self.modifier)
-        occupied = [[False] * (total) for _ in (total)]
+        occupied = [[False] * (total) for _ in range(total)]
         room_squares = [[None] * (total) for _ in range(total)]
         tries = 0
         if self.seed:
