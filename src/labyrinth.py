@@ -182,6 +182,7 @@ class Labyrinth:
             path = find_path(start, goal)
             prev = path
             while prev[2] is not None:
+                # todo: add corridor room connect logic to Rectangle
                 if self.get_room_of_square(prev[1]) is None:
                     if not self.corridor_squares[prev[1][1]][prev[1][0]]:
                         self.corridor_squares[prev[1][1]][prev[1][0]] = True
