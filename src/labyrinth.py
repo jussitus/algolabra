@@ -78,7 +78,7 @@ class Labyrinth:
         while len(rooms) < n:
             if tries == self.max_tries:
                 # print(f"Could not fit any more rooms in {self.max_tries} tries for total={total}. Trying more sparse layout...")
-                self.modifier *= 1.05
+                self.modifier *= 1.1
                 return self.generate_rooms(self.n_rooms)
             valid = True
             corner = point_in_circle(total - self.max_dim)

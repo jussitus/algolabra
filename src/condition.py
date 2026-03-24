@@ -1,13 +1,13 @@
-from shewchuk import incircle as incircle_c
-from shewchuk import ccw as ccw_c
+from det import ccw_int_exact
+from det import incircle_int_exact
 
 
 def ccw(a, b, c):
-    return ccw_c(a, b, c)
+    return ccw_int_exact(a, b, c)
 
 
 def incircle(a, b, c, d):
-    return incircle_c(a, b, c, d)
+    return incircle_int_exact(a, b, c, d)
 
 
 def right_of(x, e):
@@ -20,4 +20,4 @@ def left_of(x, e):
 
 # e above basel?
 def valid(e, basel):
-    return ccw_c(e.dest, basel.dest, basel.org)
+    return ccw(e.dest, basel.dest, basel.org)

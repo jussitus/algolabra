@@ -1,3 +1,4 @@
+import logging
 from math import sqrt
 from time import time
 import heapq as hq
@@ -18,6 +19,7 @@ from condition import (
     valid,
 )
 from point import Point
+from log_utils import timer
 
 
 class PlanarGraph:
@@ -123,6 +125,7 @@ class PlanarGraph:
         """Edges in the minimum spanning tree of the Delaunay triangulation."""
         return self._mst_delaunay
 
+    @timer(level=logging.DEBUG)
     def _compute_mst_delaunay(self) -> list[Edge]:
         """Calculates the minimum spanning tree of a Delaunay triangulation.
 
@@ -131,6 +134,7 @@ class PlanarGraph:
         """
         return _prim(self.delaunay)
 
+    @timer(level=logging.DEBUG)
     def _compute_delaunay(self):
         """Computes the Delaunay triangulation using the Guibas-Stolfi divide-and-conquer algorithm.
 
@@ -148,6 +152,7 @@ class PlanarGraph:
                 delaunay_edges.append(e)
         return left, right, edges, delaunay_edges
 
+    @timer(level=logging.DEBUG)
     def _compute_voronoi(self):
         """REDO DOCSTRING Computes the origin (org) and destination (dest) coordinates of the Voronoi edges, and the radius of the circumcircle of centered around the origin.
 
@@ -164,6 +169,7 @@ class PlanarGraph:
 
 def _voronoi(triangles: list[list[Edge]], hull: list[Edge]) -> list[Edge]:
     """Docstring todo"""
+    hull = set(hull)
     voronoi_edges = []
     for t in triangles:
         for e in t:
