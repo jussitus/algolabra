@@ -11,32 +11,39 @@ import random
 from point_generation import points_random, points_circular, points_circular_unit
 from condition import ccw
 from time import time
-from math import floor
+from math import floor, isinf
 from labyrinth import Labyrinth
-from collections import Counter
+
 import matplotlib.pyplot as plt
-from matplotlib.collections import LineCollection, PolyCollection
+from matplotlib.collections import LineCollection
 
+# n = 10000
+# points = points_circular(n, n, n, -1)
+# #points = [(0, 0), (0, 1), (1, 0), (1, 1)]
+# d = PlanarGraph(points)
+# d.run()
+# print(d)
+# exit()
+# fig, ax = plt.subplots()
+# ax.axis("equal")
+# edges_d = [(e.org, e.dest) for e in d.delaunay]
+# edges_v = []
+# for e in d.voronoi:
+#     if not isinf(e.org[0]) and not isinf(e.dest[0]):
+#         print(e)
+#         edges_v.append((e.org, e.dest))
+# l_d = LineCollection(edges_d, colors="black", linewidths=1.5)
+# l_v = LineCollection(edges_v, colors="red", linewidths=1.5)
+# ax.add_collection(l_d)
+# ax.add_collection(l_v)
+# ax.autoscale()
+# plt.show()
 
-n = 100000
-points = points_circular(n, n // 2, n // 2, 42)
-d = PlanarGraph(points)
-print(len(d.vertices))
-d.run()
-exit()
-fig, ax = plt.subplots()
-ax.axis("equal")
-edges = [(e.org, e.dest) for e in d.delaunay]
-l = LineCollection(edges, colors="black", linewidths=1.5)
-ax.add_collection(l)
-ax.autoscale()
-plt.show()
-
-exit()
+# exit()
 
 ###
-n = 2500
-lab = Labyrinth(n, 1)
+n = 500
+lab = Labyrinth(n, 3)
 
 rectangles = []
 for room in lab.rooms:

@@ -104,7 +104,7 @@ class Edge:
     def __str__(self) -> str:
         string = f"Edge({self.org} -> {self.dest})"
         return string
-
+    
     def __lt__(self, other) -> bool:
         """Compares the lengths of the edges."""
         return self.length < other.length

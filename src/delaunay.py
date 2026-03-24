@@ -97,7 +97,7 @@ class PlanarGraph:
     def hull(self) -> list[Edge]:
         """Hull edges of the Delaunay triangulation.
 
-        The list is populated the first time this property is accessed.
+        Includes both `e` and `e.sym`. The list is populated the first time this property is accessed.
         """
         if len(self._hull) > 0 or self.left is None:
             return self._hull
@@ -158,7 +158,7 @@ class PlanarGraph:
 
         The outer edges of the Voronoi diagram extend to infinity, which is treated as a single point.
         """
-        return _voronoi(self.triangles, self.hull)
+        return _voronoi(self.triangles, self.delaunay, self.hull)
 
     def run(self):
         """Computes the graph's Delaunay triangulation, coordinates of the Voronoi edges, and the minimum spanning tree of the Delaunay triangulation."""
@@ -166,25 +166,33 @@ class PlanarGraph:
         self._voronoi = self._compute_voronoi()
         self._mst_delaunay = self._compute_mst_delaunay()
 
+    def __str__(self) -> str:
+        string = f"edges(all)={len(self.edges)}, delaunay_edges(canonical)={len(self.delaunay)}, voronoi_edges(canonical)={len(self.voronoi)}, triangles={len(self.triangles)}"
+        return string
 
-def _voronoi(triangles: list[list[Edge]], hull: list[Edge]) -> list[Edge]:
-    """Docstring todo"""
-    hull = set(hull)
+def _voronoi(triangles: list[list[Edge]], delaunay_edges: list[Edge], hull: list[Edge]) -> list[Edge]:
+    """Docstring todo MAKE THIS O(N)"""
+    delaunay_set = set(delaunay_edges)
+    hull_ccw = set(hull)
+    hull_set = set(hull)
+    hull_set.update([h.sym for h in hull])
     voronoi_edges = []
-    for t in triangles:
-        for e in t:
-            vo = e.rot
-            if e not in hull:
-                vo.org, r_sym = circumcircle(e.sym)
-                vo.sym.radius = r_sym
-            else:
+    if len(triangles) < 1:
+        return voronoi_edges
+    for e in delaunay_edges:
+        vo = e.rot
+        if e not in hull_set:
+            vo.org, vo.radius = circumcircle(e.sym)
+            vo.sym.org, vo.sym.radius = circumcircle(e)
+        else:
+            if e in hull_ccw:
                 vo.org = (float("inf"), float("inf"))
-
-            vo.sym.org, r = circumcircle(e)
-            vo.radius = r
-            vo.sym.radius = r
-            if vo.org < vo.dest:
-                voronoi_edges.append(vo)
+                vo.sym.org, vo.sym.radius = circumcircle(e)
+            else:
+                vo.sym.org = (float("inf"), float("inf"))
+                vo.org, vo.radius = circumcircle(e.sym)
+        voronoi_edges.append(vo)
+    voronoi_edges = [vo if vo.rot in delaunay_set else vo.sym for vo in voronoi_edges]
     return voronoi_edges
 
 

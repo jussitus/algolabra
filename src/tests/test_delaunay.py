@@ -6,7 +6,7 @@
 - ...
 
 """
-
+from math import isinf
 from sympy import Matrix
 import pytest
 from point_generation import points_circular
@@ -99,3 +99,25 @@ def test_each_hull_edge_in_only_one_triangle(graph_large):
             if e in t:
                 count += 1
         assert count == 1
+
+def test_same_number_of_delaunay_and_voronoi_edges(graph_large):
+    graph = graph_large
+    assert len(graph.delaunay) == len(graph.voronoi)
+
+def test_all_non_hull_voronoi_edges_have_finite_geometry(graph_large):
+    graph = graph_large
+    hull = set(graph.hull)
+    for e in graph.edges:
+        if e.dual and (e.rot not in hull and e.rot.sym not in hull):
+            # split test?
+            assert e.radius is not None
+            assert e.radius > 0
+            assert not isinf(e.org[0])
+            assert not isinf(e.dest[0])
+
+def test_all_hull_voronoi_edges_extend_to_infinity(graph_large):
+    graph = graph_large
+    hull = set(graph.hull)
+    for e in hull:
+        vo = e.rot
+        assert isinf(vo.org[0]) or isinf(vo.dest[0])

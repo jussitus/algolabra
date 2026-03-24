@@ -78,7 +78,7 @@ class Labyrinth:
         while len(rooms) < n:
             if tries == self.max_tries:
                 # print(f"Could not fit any more rooms in {self.max_tries} tries for total={total}. Trying more sparse layout...")
-                self.modifier *= 1.1
+                self.modifier *= 1.05
                 return self.generate_rooms(self.n_rooms)
             valid = True
             corner = point_in_circle(total - self.max_dim)
@@ -111,7 +111,7 @@ class Labyrinth:
                         break
                     occupied[corner[1] + h][corner[0] + w] = True
                     if w >= 0 and h >= 0 and w < width and h < height:
-                        room_squares[corner[1] + h][corner[0] + w] = room
+                        room_squares[corner[1] + h][corner[0] + w] = room # type: ignore
             rooms.append(room)
             room_centers.append(room.center)
         return rooms, room_squares, room_centers
@@ -120,7 +120,8 @@ class Labyrinth:
         def distance(a, b):
             if self.get_room_of_square(a) is self.get_room_of_square(b):
                 return -10000
-            # return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+            #return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+            return abs(a[0] - b[0]) + abs(a[1] - b[1])
             return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
         def neighbors(square):
@@ -152,12 +153,12 @@ class Labyrinth:
                 for neighbor in neighbors(current[1]):
                     # print(f"width={len(self.room_squares[0])}, height={len(self.room_squares)}, current={neighbor}")
                     room_in_square = self.room_squares[neighbor[1]][neighbor[0]]
-                    if room_in_square is not None and (room_in_square.center == goal):
-                        return current
+                    if room_in_square is not None and room_in_square.center == goal:
+                            return current
                     if not visited[neighbor[1]][neighbor[0]]:
                         if not self.corridor_squares[neighbor[1]][
                             neighbor[0]
-                        ]:  # and not room_in_square
+                        ]:
                             visited[neighbor[1]][neighbor[0]] = True
                             hq.heappush(
                                 heap,
