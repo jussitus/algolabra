@@ -1,23 +1,28 @@
+from modulefinder import packagePathMap
+from pickletools import int4
 import random
 from math import sqrt, floor
 import heapq as hq
+from typing import Self
 from delaunay import PlanarGraph
 from edge import Edge, make_quad_edge, splice
-from point import Point
+from point import Point, PointInt
 
 # WIP
 
 
 class Rectangle:
-    def __init__(self, corner, width=1, height=1):
-        self.width = width
-        self.height = height
-        self.corner = corner
-        self.center = (corner[0] + width // 2, corner[1] + height // 2)
+    def __init__(self, corner: PointInt, width: int = 1, height: int = 1):
+        self.width: int = width
+        self.height: int = height
+        self.corner: PointInt = corner
+        self.center: PointInt = (corner[0] + width // 2, corner[1] + height // 2)
+        self.edges: list[Edge]
+        self.corner_edge: Edge
         self.edges, self.corner_edge = self.create()
 
-    def create(self):
-        edges = []
+    def create(self) -> tuple[list[Edge], Edge]:
+        edges: list[Edge] = []
         corner_edge = make_quad_edge(self.corner, (self.corner[0] + 1, self.corner[1]))
         edges.append(corner_edge)
         top = self.add_side(edges, corner_edge, self.width - 1, (1, 0))
@@ -27,7 +32,9 @@ class Rectangle:
         splice(left.sym, corner_edge)
         return edges, corner_edge
 
-    def add_side(self, edges, current, length, displacement):
+    def add_side(
+        self, edges: list[Edge], current: Edge, length: int, displacement: Point
+    ) -> Edge:
         for _ in range(length):
             next_org = current.dest
             next_dest = (
@@ -52,34 +59,40 @@ class Corridor(Rectangle):
 
 
 class Labyrinth:
-    def __init__(self, n_rooms, seed=0):
-        self.n_rooms = n_rooms
-        self.seed = seed
-        self.max_dim = 10  # max(5, floor(sqrt(max_rooms)))
-        self.min_dim = 2  # max(2, self.max_dim // 3)
-        self.gap = 1
-        self.modifier = 1
-        self.max_tries = 1000
-        self.rooms, self.room_squares, self.room_centers = self.generate_rooms(n_rooms)
-        self.corridor_squares = [
+    def __init__(self, num_rooms: int, seed: int, max_dim: int, min_dim: int):
+        self.num_rooms: int = num_rooms
+        self.seed: int = seed
+        self.max_dim: int = max_dim
+        self.min_dim: int = min_dim
+        self.gap: int = 1
+        self.modifier: float = 1.1
+        self.max_tries: int = 1000
+        self.rooms: list[Room]
+        self.room_squares: list[list[Room | None]]
+        self.room_centers: list[PointInt]
+        self.rooms, self.room_squares, self.room_centers = self.generate_rooms()
+        self.corridor_squares: list[list[Corridor | None]] = [
             [None] * len(self.room_squares) for _ in range(len(self.room_squares))
         ]
-        self.corridors = self.create_corridors()
 
-    def generate_rooms(self, n):
-        rooms = []
-        room_centers = []
-        total = floor(self.max_dim * self.modifier)
-        occupied = [[False] * (total) for _ in range(total)]
-        room_squares = [[None] * (total) for _ in range(total)]
+        self.corridors: list[Corridor] = self.create_corridors()
+
+    def generate_rooms(
+        self,
+    ) -> tuple[list[Room], list[list[Room | None]], list[PointInt]]:
+        rooms: list[Room] = []
+        room_centers: list[PointInt] = []
+        total: int = floor(self.max_dim * self.modifier)
+        occupied: list[list[bool]] = [[False] * (total) for _ in range(total)]
+        room_squares: list[list[Room | None]] = [[None] * (total) for _ in range(total)]
         tries = 0
-        if self.seed:
+        if self.seed != -1:
             random.seed(self.seed)
-        while len(rooms) < n:
+        while len(rooms) < self.num_rooms:
             if tries == self.max_tries:
                 # print(f"Could not fit any more rooms in {self.max_tries} tries for total={total}. Trying more sparse layout...")
-                self.modifier *= 1.05
-                return self.generate_rooms(self.n_rooms)
+                self.modifier *= 1.1
+                return self.generate_rooms()
             valid = True
             corner = point_in_circle(total - self.max_dim)
             width = random.randint(self.min_dim, self.max_dim)
@@ -87,8 +100,8 @@ class Labyrinth:
             if (
                 corner[0] + width + self.gap > len(room_squares[0])
                 or corner[1] + height + self.gap > len(room_squares)
-                or corner[0] - self.gap > len(room_squares[0])
-                or corner[1] - self.gap > len(room_squares)
+                or corner[0] - self.gap < 0
+                or corner[1] - self.gap < 0
             ):
                 tries += 1
                 continue
@@ -117,89 +130,113 @@ class Labyrinth:
         return rooms, room_squares, room_centers
 
     def create_corridors(self):
-        def distance(a, b):
-            if self.get_room_of_square(a) is self.get_room_of_square(b):
-                return -10000
-            # return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
-            return abs(a[0] - b[0]) + abs(a[1] - b[1])
-            return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
-
-        def neighbors(square):
-            squares = []
-            if square[1] + 1 < len(self.room_squares):
-                up = (square[0], square[1] + 1)
-                squares.append(up)
-            if square[1] - 1 < len(self.room_squares):
-                down = (square[0], square[1] - 1)
-                squares.append(down)
-            if square[0] - 1 < len(self.room_squares[0]):
-                left = (square[0] - 1, square[1])
-                squares.append(left)
-            if square[0] + 1 < len(self.room_squares[0]):
-                right = (square[0] + 1, square[1])
-                squares.append(right)
-            return squares
-
-        def find_path(start, end):
-            heap = []
-            visited = [
-                [False] * len(self.room_squares) for _ in range(len(self.room_squares))
-            ]
-            first = (distance(start, goal), start, None)
-            visited[first[1][1]][first[1][0]] = True
-            hq.heappush(heap, first)
-            while True:
-                current = hq.heappop(heap)
-                for neighbor in neighbors(current[1]):
-                    # print(f"width={len(self.room_squares[0])}, height={len(self.room_squares)}, current={neighbor}")
-                    room_in_square = self.room_squares[neighbor[1]][neighbor[0]]
-                    if room_in_square is not None and room_in_square.center == goal:
-                        return current
-                    if not visited[neighbor[1]][neighbor[0]]:
-                        if not self.corridor_squares[neighbor[1]][neighbor[0]]:
-                            visited[neighbor[1]][neighbor[0]] = True
-                            hq.heappush(
-                                heap,
-                                (
-                                    distance(neighbor, goal) + current[0],
-                                    neighbor,
-                                    current,
-                                ),
-                            )
-                        else:
-                            visited[neighbor[1]][neighbor[0]] = True
-                            hq.heappush(heap, (current[0], neighbor, current))
-
         connections = self.connect_rooms(self.room_centers)
-        # print(self.room_centers)
-        corridors = []
+        corridors: list[Corridor] = []
+        path_finder = PathFinder(self)
         for edge in connections:
-            r1 = self.get_room_of_square(edge.org)
-            r2 = self.get_room_of_square(edge.dest)
-            start = r1.center
-            goal = r2.center
-            path = find_path(start, goal)
-            prev = path
-            while prev[2] is not None:
+            path: Path = path_finder.find_path(edge.org, edge.dest)
+            current = path
+            while current.path is not None:
                 # todo: add corridor room connect logic to Rectangle
-                if self.get_room_of_square(prev[1]) is None:
-                    if not self.corridor_squares[prev[1][1]][prev[1][0]]:
-                        self.corridor_squares[prev[1][1]][prev[1][0]] = True
-                        corridor = Rectangle(prev[1])
+                if self.get_room_of_square(current.current) is None:
+                    if self.get_corridor_of_square(current.current) is None:
+                        corridor = Corridor(current.current)
+                        self.corridor_squares[current.current[1]][current.current[0]] = corridor
                         corridors.append(corridor)
-                prev = prev[2]
+                current = current.path
         return corridors
 
-    def get_room_of_square(self, square: Point):
-        return self.room_squares[square[1]][square[0]]  # type: ignore
+    def get_room_of_square(self, square: PointInt):
+        return self.room_squares[square[1]][square[0]]
 
-    def connect_rooms(self, room_centers):
+    def get_corridor_of_square(self, square: PointInt):
+        return self.corridor_squares[square[1]][square[0]]
+
+    def connect_rooms(self, room_centers: list[PointInt]) -> list[Edge]:
         d = PlanarGraph(room_centers)
         d.run()
         return d.mst_delaunay
 
 
-def point_in_circle(width):
+class Path:
+    def __init__(self, h_length: float, length: float, current: PointInt, path: Path | None = None):
+        self.h_length: float = h_length
+        self.length: float = length
+        self.current: PointInt = current
+        self.path: Path | None = path
+
+    def __lt__(self, other: Self) -> bool:
+        return self.h_length < other.h_length
+
+
+class PathFinder:
+    def __init__(self, labyrinth: Labyrinth):
+        self.labyrinth: Labyrinth = labyrinth
+
+    def find_path(self, start: PointInt, end: PointInt) -> Path:
+        size = len(self.labyrinth.room_squares)
+        heap: list[Path] = []
+        visited = [[False] * size for _ in range(size)]
+        first = Path(self._heuristic(start, end) + 0, 0, start, None)
+        visited[first.current[1]][first.current[0]] = True
+        hq.heappush(heap, first)
+        while len(heap) > 0:
+            current = hq.heappop(heap)
+            room_in_current = self.labyrinth.room_squares[current.current[1]][current.current[0]]
+            if room_in_current is not None and room_in_current.center == end:
+                return current
+            visited[current.current[1]][current.current[0]] = True
+            for neighbor in self._neighbors(current.current):
+                room_in_square = self.labyrinth.room_squares[neighbor[1]][neighbor[0]]
+                if room_in_square is not None and room_in_square.center == end:
+                    hq.heappush(
+                        heap,
+                        Path(
+                            current.length + 1,
+                            current.length + 1,
+                            neighbor,
+                            current,
+                        ),
+                    )
+                if not visited[neighbor[1]][neighbor[0]]:
+                    corridor_in_square = self.labyrinth.corridor_squares[neighbor[1]][
+                        neighbor[0]
+                    ]
+                    if corridor_in_square is None:
+                        hq.heappush(
+                            heap,
+                            Path(
+                                self._heuristic(neighbor, end) + current.length + 1,
+                                current.length + 1,
+                                neighbor,
+                                current,
+                            ),
+                        )
+                    else:
+                        hq.heappush(heap, Path(self._heuristic(neighbor, end) + current.length, current.length, neighbor, current))
+    def _heuristic(self, a: PointInt, b: PointInt):
+        #return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+        # return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
+
+    def _neighbors(self, square: PointInt) -> list[PointInt]:
+        squares: list[PointInt] = []
+        if square[1] + 1 < len(self.labyrinth.room_squares):
+            up = (square[0], square[1] + 1)
+            squares.append(up)
+        if square[1] > 0 and square[1] - 1 < len(self.labyrinth.room_squares):
+            down = (square[0], square[1] - 1)
+            squares.append(down)
+        if square[0] > 0 and square[0] - 1 < len(self.labyrinth.room_squares[0]):
+            left = (square[0] - 1, square[1])
+            squares.append(left)
+        if square[0] + 1 < len(self.labyrinth.room_squares[0]):
+            right = (square[0] + 1, square[1])
+            squares.append(right)
+        return squares
+
+
+def point_in_circle(width: int):
     mid_x = width // 2
     mid_y = width // 2
     while True:
