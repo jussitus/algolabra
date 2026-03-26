@@ -1,4 +1,5 @@
 from math import sqrt
+from typing import Self, override
 from condition import ccw
 from point import Point
 
@@ -18,7 +19,7 @@ class Edge:
         `radius`: The radius of the circumcircle centered on `org`. Only defined for Voronoi edges.
     """
 
-    __slots__ = [
+    __slots__: list[str] = [
         "org",
         "onext",
         "sym",
@@ -27,7 +28,7 @@ class Edge:
         "dual",
         "radius",
         "_length",
-        "data"
+        "data",
     ]
 
     def __init__(self):
@@ -36,11 +37,11 @@ class Edge:
         Edges are only created in fours by the function `make_quad_edge`, so `self.org`, `self.sym`, `self.rot` and `self.tor` are never None after creation.
 
         """
-        self.org: Point = None  # type: ignore
-        self.sym: Edge = None  # type: ignore
+        self.org: Point = None  # pyright: ignore[reportAttributeAccessIssue]
+        self.sym: Edge = None  # pyright: ignore[reportAttributeAccessIssue]
         self.onext: Edge = self
-        self.rot: Edge = None  # type: ignore
-        self.tor: Edge = None  # type: ignore
+        self.rot: Edge = None  # pyright: ignore[reportAttributeAccessIssue]
+        self.tor: Edge = None  # pyright: ignore[reportAttributeAccessIssue]
         self.dual: bool = False
         self.radius: float | None = None
         self._length: float | None = None
@@ -92,7 +93,7 @@ class Edge:
         Calculated when first accessed. Can be `float('inf')` for outer Voronoi edges.
         """
         if self._length is None:
-            if self.org is not None and self.dest is not None:
+            if self.org is not None and self.dest is not None:  # pyright: ignore[reportUnnecessaryComparison]
                 self._length = sqrt(
                     (self.org[0] - self.dest[0]) ** 2
                     + (self.org[1] - self.dest[1]) ** 2
@@ -101,16 +102,17 @@ class Edge:
                 return float("inf")  # infinite voronoi edge
         return self._length
 
+    @override
     def __str__(self) -> str:
         string = f"Edge({self.org} -> {self.dest})"
         return string
-    
-    def __lt__(self, other) -> bool:
+
+    def __lt__(self, other: Self) -> bool:
         """Compares the lengths of the edges."""
         return self.length < other.length
 
 
-def make_quad_edge(org, dest) -> Edge:
+def make_quad_edge(org: Point, dest: Point) -> Edge:
     """Doc string to do"""
     e = Edge()
     e_sym = Edge()

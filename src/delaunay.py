@@ -18,7 +18,7 @@ from condition import (
     left_of,
     valid,
 )
-from point import Point
+from point import Point, PointInt
 from log_utils import timer
 
 
@@ -29,20 +29,20 @@ class PlanarGraph:
         vertices: a list of (x,y) points
     """
 
-    def __init__(self, vertices):
-        self._vertices: list[tuple[float, float]] = sorted(vertices)
+    def __init__(self, vertices: list[PointInt]):
+        self._vertices: list[Point] = sorted(vertices)
         self._edges: list[Edge] = []
         self._left: Edge | None = None
         self._right: Edge | None = None
-        self._triangles: list[list[Edge]] = []
         self._hull: list[Edge] = []
         self._delaunay: list[Edge] = []
+        self._triangles: list[tuple[Edge, Edge, Edge]] = []
         self._voronoi: list[Edge] = []
         self._mst_delaunay: list[Edge] = []
         self._mst_voronoi: list[Edge] = []
 
     @property
-    def vertices(self) -> list[tuple[int | float, int | float]]:
+    def vertices(self) -> list[Point]:
         """Vertices of the graph."""
         return self._vertices
 
@@ -76,14 +76,14 @@ class PlanarGraph:
         return self._right
 
     @property
-    def triangles(self) -> list[list[Edge]]:
+    def triangles(self) -> list[tuple[Edge, Edge, Edge]]:
         """Triangles in the Delaunay triangulation.
 
         Each triangle is a list of three edges in the counterclockwise direction. The list of triangles is populated the first time this property is accessed.
         """
         if len(self._triangles) > 0 or self.left is None:
             return self._triangles
-        triangles = []
+        triangles: list[tuple[Edge, Edge, Edge]] = []
         for e in self.delaunay:
             a, b, c = triangle_ccw(e)
             if not (a.org < b.org and a.org < c.org):
@@ -135,7 +135,7 @@ class PlanarGraph:
         return _prim(self.delaunay)
 
     @timer(level=logging.DEBUG)
-    def _compute_delaunay(self):
+    def _compute_delaunay(self) -> tuple[Edge, Edge, list[Edge], list[Edge]]:
         """Computes the Delaunay triangulation using the Guibas-Stolfi divide-and-conquer algorithm.
 
         Args:
@@ -146,7 +146,7 @@ class PlanarGraph:
         """
         left, right, bad_edges = _delaunay(self._vertices, self._edges, [])
         edges = list(set(self.edges) - set(bad_edges))
-        delaunay_edges = []
+        delaunay_edges: list[Edge] = []
         for e in edges:
             if not e.dual and e.org < e.dest:
                 delaunay_edges.append(e)
@@ -170,13 +170,18 @@ class PlanarGraph:
         string = f"edges(all)={len(self.edges)}, delaunay_edges(canonical)={len(self.delaunay)}, voronoi_edges(canonical)={len(self.voronoi)}, triangles={len(self.triangles)}"
         return string
 
-def _voronoi(triangles: list[list[Edge]], delaunay_edges: list[Edge], hull: list[Edge]) -> list[Edge]:
+
+def _voronoi(
+    triangles: list[tuple[Edge, Edge, Edge]],
+    delaunay_edges: list[Edge],
+    hull: list[Edge],
+) -> list[Edge]:
     """Docstring todo MAKE THIS O(N)"""
     delaunay_set = set(delaunay_edges)
     hull_ccw = set(hull)
     hull_set = set(hull)
     hull_set.update([h.sym for h in hull])
-    voronoi_edges = []
+    voronoi_edges: list[Edge] = []
     if len(triangles) < 1:
         return voronoi_edges
     for e in delaunay_edges:
@@ -192,7 +197,6 @@ def _voronoi(triangles: list[list[Edge]], delaunay_edges: list[Edge], hull: list
                 vo.sym.org = (float("inf"), float("inf"))
                 vo.org, vo.radius = circumcircle(e.sym)
         voronoi_edges.append(vo)
-    voronoi_edges = [vo if vo.rot in delaunay_set else vo.sym for vo in voronoi_edges]
     return voronoi_edges
 
 
@@ -205,9 +209,9 @@ def _prim(graph: list[Edge]) -> list[Edge]:
     Returns:
         A list of the edges in the minimum spanning tree.
     """
-    visited = {}
-    mst = []
-    heap = []
+    visited: dict[Point, bool] = {}
+    mst: list[Edge] = []
+    heap: list[Edge] = []
 
     first = graph[0]
     hq.heappush(heap, first.sym)
@@ -229,7 +233,9 @@ def _prim(graph: list[Edge]) -> list[Edge]:
     return mst
 
 
-def _delaunay(s, edges, bad_edges):
+def _delaunay(
+    s: list[Point], edges: list[Edge], bad_edges: list[Edge]
+) -> tuple[Edge, Edge, list[Edge]]:
     """Docstring to-do"""
     if len(s) < 2:
         raise ValueError(f"len(s)={len(s)} is less than 2")

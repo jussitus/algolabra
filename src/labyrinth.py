@@ -17,28 +17,28 @@ class Rectangle:
         self.edges, self.corner_edge = self.create()
 
     def create(self):
-        def add_side(edges, current, length, displacement):
-            for _ in range(length):
-                next_org = current.dest
-                next_dest = (
-                    next_org[0] + displacement[0],
-                    next_org[1] + displacement[1],
-                )
-                next = make_quad_edge(next_org, next_dest)
-                splice(current.sym, next)
-                current = next
-                edges.append(current)
-            return current
-
         edges = []
         corner_edge = make_quad_edge(self.corner, (self.corner[0] + 1, self.corner[1]))
         edges.append(corner_edge)
-        top = add_side(edges, corner_edge, self.width - 1, (1, 0))
-        right = add_side(edges, top, self.height, (0, 1))
-        bottom = add_side(edges, right, self.width, (-1, 0))
-        left = add_side(edges, bottom, self.height, (0, -1))
+        top = self.add_side(edges, corner_edge, self.width - 1, (1, 0))
+        right = self.add_side(edges, top, self.height, (0, 1))
+        bottom = self.add_side(edges, right, self.width, (-1, 0))
+        left = self.add_side(edges, bottom, self.height, (0, -1))
         splice(left.sym, corner_edge)
         return edges, corner_edge
+
+    def add_side(self, edges, current, length, displacement):
+        for _ in range(length):
+            next_org = current.dest
+            next_dest = (
+                next_org[0] + displacement[0],
+                next_org[1] + displacement[1],
+            )
+            next = make_quad_edge(next_org, next_dest)
+            splice(current.sym, next)
+            current = next
+            edges.append(current)
+        return current
 
 
 class Room(Rectangle):
@@ -55,7 +55,7 @@ class Labyrinth:
     def __init__(self, n_rooms, seed=0):
         self.n_rooms = n_rooms
         self.seed = seed
-        self.max_dim = 8  # max(5, floor(sqrt(max_rooms)))
+        self.max_dim = 10  # max(5, floor(sqrt(max_rooms)))
         self.min_dim = 2  # max(2, self.max_dim // 3)
         self.gap = 1
         self.modifier = 1
@@ -111,7 +111,7 @@ class Labyrinth:
                         break
                     occupied[corner[1] + h][corner[0] + w] = True
                     if w >= 0 and h >= 0 and w < width and h < height:
-                        room_squares[corner[1] + h][corner[0] + w] = room # type: ignore
+                        room_squares[corner[1] + h][corner[0] + w] = room  # type: ignore
             rooms.append(room)
             room_centers.append(room.center)
         return rooms, room_squares, room_centers
@@ -120,7 +120,7 @@ class Labyrinth:
         def distance(a, b):
             if self.get_room_of_square(a) is self.get_room_of_square(b):
                 return -10000
-            #return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+            # return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
             return abs(a[0] - b[0]) + abs(a[1] - b[1])
             return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
@@ -154,11 +154,9 @@ class Labyrinth:
                     # print(f"width={len(self.room_squares[0])}, height={len(self.room_squares)}, current={neighbor}")
                     room_in_square = self.room_squares[neighbor[1]][neighbor[0]]
                     if room_in_square is not None and room_in_square.center == goal:
-                            return current
+                        return current
                     if not visited[neighbor[1]][neighbor[0]]:
-                        if not self.corridor_squares[neighbor[1]][
-                            neighbor[0]
-                        ]:
+                        if not self.corridor_squares[neighbor[1]][neighbor[0]]:
                             visited[neighbor[1]][neighbor[0]] = True
                             hq.heappush(
                                 heap,

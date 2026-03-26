@@ -1,18 +1,21 @@
-def incircle_int_exact(a, b, c, d):
-    ax: int = a[0]
-    bx: int = b[0]
-    cx: int = c[0]
-    dx: int = d[0]
+from point import Point
 
-    ay: int = a[1]
-    by: int = b[1]
-    cy: int = c[1]
-    dy: int = d[1]
 
-    az: int = ax**2 + ay**2
-    bz: int = bx**2 + by**2
-    cz: int = cx**2 + cy**2
-    dz: int = dx**2 + dy**2
+def incircle_int_exact(a: Point, b: Point, c: Point, d: Point) -> bool:
+    ax = a[0]
+    bx = b[0]
+    cx = c[0]
+    dx = d[0]
+
+    ay = a[1]
+    by = b[1]
+    cy = c[1]
+    dy = d[1]
+
+    az = ax**2 + ay**2
+    bz = bx**2 + by**2
+    cz = cx**2 + cy**2
+    dz = dx**2 + dy**2
 
     """
     ax ay az 1
@@ -56,14 +59,14 @@ def incircle_int_exact(a, b, c, d):
     return det > 0
 
 
-def ccw_int_exact(a, b, c):
-    ax: int = a[0]
-    bx: int = b[0]
-    cx: int = c[0]
+def ccw_int_exact(a: Point, b: Point, c: Point) -> bool:
+    ax = a[0]
+    bx = b[0]
+    cx = c[0]
 
-    ay: int = a[1]
-    by: int = b[1]
-    cy: int = c[1]
+    ay = a[1]
+    by = b[1]
+    cy = c[1]
 
     """
     (ax-cx) (ay-cy) 0
