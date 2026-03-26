@@ -1,4 +1,4 @@
-from det import ccw_int_exact, incircle_int_exact
+from condition_calc import ccw_int_exact, incircle_int_exact
 from point import Point
 
 
