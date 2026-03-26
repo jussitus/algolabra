@@ -180,24 +180,18 @@ class PathFinder:
         first = Path(self._heuristic(start, end) + 0, 0, start, None)
         visited[first.current[1]][first.current[0]] = True
         hq.heappush(heap, first)
-        while len(heap) > 0:
+        best = []
+        while True:
             current = hq.heappop(heap)
             room_in_current = self.labyrinth.room_squares[current.current[1]][current.current[0]]
-            if room_in_current is not None and room_in_current.center == end:
-                return current
+            if len(best) > 0 and (room_in_current is None or room_in_current.center != end):
+                 return hq.heappop(best)
             visited[current.current[1]][current.current[0]] = True
             for neighbor in self._neighbors(current.current):
                 room_in_square = self.labyrinth.room_squares[neighbor[1]][neighbor[0]]
                 if room_in_square is not None and room_in_square.center == end:
-                    hq.heappush(
-                        heap,
-                        Path(
-                            current.length + 1,
-                            current.length + 1,
-                            neighbor,
-                            current,
-                        ),
-                    )
+                    cand = Path(current.length, current.length, current.current, current.path)
+                    hq.heappush(best, cand)
                 if not visited[neighbor[1]][neighbor[0]]:
                     corridor_in_square = self.labyrinth.corridor_squares[neighbor[1]][
                         neighbor[0]
