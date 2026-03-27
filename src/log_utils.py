@@ -20,3 +20,14 @@ def timer(level=logging.DEBUG):
         return wrapper
 
     return decorator
+
+
+def log_after_state(level=logging.DEBUG):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs,):
+            res = func(self, *args, **kwargs)
+            logger.log(level, f"{self}")
+            return res
+        return wrapper
+    return decorator

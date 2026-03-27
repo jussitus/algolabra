@@ -1,5 +1,6 @@
 from modulefinder import packagePathMap
 from pickletools import int4
+from posixpath import dirname
 import random
 from math import sqrt, floor
 import heapq as hq
@@ -134,14 +135,16 @@ class Labyrinth:
         corridors: list[Corridor] = []
         path_finder = PathFinder(self)
         for edge in connections:
-            path: Path = path_finder.find_path(edge.org, edge.dest)
+            path: Path = path_finder.find_path_greedy(edge.org, edge.dest)
             current = path
-            while current.path is not None:
+            while current is not None:
                 # todo: add corridor room connect logic to Rectangle
                 if self.get_room_of_square(current.current) is None:
                     if self.get_corridor_of_square(current.current) is None:
                         corridor = Corridor(current.current)
-                        self.corridor_squares[current.current[1]][current.current[0]] = corridor
+                        self.corridor_squares[current.current[1]][
+                            current.current[0]
+                        ] = corridor
                         corridors.append(corridor)
                 current = current.path
         return corridors
@@ -155,11 +158,18 @@ class Labyrinth:
     def connect_rooms(self, room_centers: list[PointInt]) -> list[Edge]:
         d = PlanarGraph(room_centers)
         d.run()
-        return d.mst_delaunay
+        connections: list[Edge] = d.mst_delaunay
+        return connections
 
 
 class Path:
-    def __init__(self, h_length: float, length: float, current: PointInt, path: Path | None = None):
+    def __init__(
+        self,
+        h_length: float,
+        length: float,
+        current: PointInt,
+        path: Path | None = None,
+    ):
         self.h_length: float = h_length
         self.length: float = length
         self.current: PointInt = current
@@ -173,43 +183,37 @@ class PathFinder:
     def __init__(self, labyrinth: Labyrinth):
         self.labyrinth: Labyrinth = labyrinth
 
-    def find_path(self, start: PointInt, end: PointInt) -> Path:
-        size = len(self.labyrinth.room_squares)
-        heap: list[Path] = []
-        visited = [[False] * size for _ in range(size)]
-        first = Path(self._heuristic(start, end) + 0, 0, start, None)
-        visited[first.current[1]][first.current[0]] = True
-        hq.heappush(heap, first)
-        best = []
+    def find_path_greedy(self, start: PointInt, end: PointInt) -> Path:
+        current = Path(self._heuristic(start, end), 0, start, None)
         while True:
-            current = hq.heappop(heap)
-            room_in_current = self.labyrinth.room_squares[current.current[1]][current.current[0]]
-            if len(best) > 0 and (room_in_current is None or room_in_current.center != end):
-                 return hq.heappop(best)
-            visited[current.current[1]][current.current[0]] = True
-            for neighbor in self._neighbors(current.current):
-                room_in_square = self.labyrinth.room_squares[neighbor[1]][neighbor[0]]
-                if room_in_square is not None and room_in_square.center == end:
-                    cand = Path(current.length, current.length, current.current, current.path)
-                    hq.heappush(best, cand)
-                if not visited[neighbor[1]][neighbor[0]]:
-                    corridor_in_square = self.labyrinth.corridor_squares[neighbor[1]][
-                        neighbor[0]
-                    ]
-                    if corridor_in_square is None:
-                        hq.heappush(
-                            heap,
-                            Path(
-                                self._heuristic(neighbor, end) + current.length + 1,
-                                current.length + 1,
-                                neighbor,
-                                current,
-                            ),
-                        )
-                    else:
-                        hq.heappush(heap, Path(self._heuristic(neighbor, end) + current.length, current.length, neighbor, current))
+            room = self.labyrinth.get_room_of_square(current.current)
+            if room is not None and room.center == end:
+                break
+            neighbors = self._neighbors(current.current)
+            best_neighbor = neighbors[0]
+            best_distance = self._heuristic(best_neighbor, end)
+            for neighbor in neighbors:
+                distance = self._heuristic(neighbor, end)
+                if distance < current.h_length:
+                    if current.path is not None:
+                        direction = current.path.current
+                        if (
+                            abs(direction[0] - neighbor[0]) == 1
+                            or abs(direction[1] - neighbor[1]) == 1
+                        ):
+                            distance += 0.4
+                    if self.labyrinth.get_corridor_of_square(neighbor) is not None:
+                        distance -= 0.4
+                    if self.labyrinth.get_room_of_square(neighbor):
+                        distance += 1.1
+                    if distance < best_distance:
+                        best_neighbor = neighbor
+                        best_distance = distance
+            current = Path(best_distance, current.length + 1, best_neighbor, current)
+        return current
+
     def _heuristic(self, a: PointInt, b: PointInt):
-        #return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+        # return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
         # return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 

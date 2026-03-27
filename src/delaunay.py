@@ -1,6 +1,5 @@
 import logging
 from math import sqrt
-from time import time
 import heapq as hq
 from edge import (
     Edge,
@@ -19,7 +18,7 @@ from condition import (
     valid,
 )
 from point import Point, PointInt
-from log_utils import timer
+from log_utils import timer, log_after_state
 
 
 class PlanarGraph:
@@ -159,7 +158,7 @@ class PlanarGraph:
         The outer edges of the Voronoi diagram extend to infinity, which is treated as a single point.
         """
         return _voronoi(self.triangles, self.delaunay, self.hull)
-
+    @log_after_state(level=logging.DEBUG)
     def run(self):
         """Computes the graph's Delaunay triangulation, coordinates of the Voronoi edges, and the minimum spanning tree of the Delaunay triangulation."""
         self._left, self._right, self._edges, self._delaunay = self._compute_delaunay()
@@ -167,7 +166,15 @@ class PlanarGraph:
         self._mst_delaunay = self._compute_mst_delaunay()
 
     def __str__(self) -> str:
-        string = f"edges(all)={len(self.edges)}, delaunay_edges(canonical)={len(self.delaunay)}, voronoi_edges(canonical)={len(self.voronoi)}, triangles={len(self.triangles)}"
+        string = f"len(self.vertices): {len(self.vertices)}\n"
+        string += f"len(self.edges): {len(self.edges)}\n"
+        string += f"self.left: {self.left}\n"
+        string += f"self.right: {self.right}\n"
+        string += f"len(self.hull): {len(self.hull)}\n"
+        string += f"len(self.delaunay): {len(self.delaunay)}\n"
+        string += f"len(self.voronoi): {len(self.voronoi)}\n"
+        string += f"len(self.triangles): {len(self.triangles)}\n"
+        string += f"len(self.mst_delaunay): {len(self.mst_delaunay)}\n"
         return string
 
 
