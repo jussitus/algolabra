@@ -21,8 +21,6 @@ def big(l):
     ]
 
 
-
-
 def test_ccw_collinear_int():
     assert not ccw(*COLLINEAR_THREE_INT)
 
@@ -30,8 +28,10 @@ def test_ccw_collinear_int():
 def test_ccw_collinear_int_big():
     assert not ccw(*big(COLLINEAR_THREE_INT))
 
+
 def test_incircle_collinear_int():
     assert not incircle(*COLLINEAR_FOUR_INT)
+
 
 def test_ccw_triangle_from_top_to_left_to_right():
     assert ccw(*TRIANGLE_INT_TOP_LEFT_RIGHT)

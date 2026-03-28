@@ -14,6 +14,7 @@ class EdgeDrawer:
         _ = self._ax.add_collection(lc)
 
     def show(self):
+        _ = self._ax.invert_yaxis()
         _ = self._ax.axis("equal")
         _ = self._ax.autoscale()
         _ = plt.show()

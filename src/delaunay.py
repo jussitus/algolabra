@@ -158,6 +158,7 @@ class PlanarGraph:
         The outer edges of the Voronoi diagram extend to infinity, which is treated as a single point.
         """
         return _voronoi(self.triangles, self.delaunay, self.hull)
+
     @log_after_state(level=logging.DEBUG)
     def run(self):
         """Computes the graph's Delaunay triangulation, coordinates of the Voronoi edges, and the minimum spanning tree of the Delaunay triangulation."""
@@ -245,7 +246,8 @@ def _delaunay(
 ) -> tuple[Edge, Edge, list[Edge]]:
     """Docstring to-do"""
     if len(s) < 2:
-        raise ValueError(f"len(s)={len(s)} is less than 2")
+        msg = f"len(s)={len(s)} is less than 2"
+        raise ValueError(msg)
     if len(s) == 2:
         a = make_quad_edge(s[0], s[1])
         edges.extend([a, a.sym, a.rot, a.tor])

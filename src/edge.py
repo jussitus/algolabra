@@ -1,5 +1,5 @@
 from math import sqrt
-from typing import Self, override
+from typing import Any, Self, override
 from condition import ccw
 from point import Point
 
@@ -45,7 +45,7 @@ class Edge:
         self.dual: bool = False
         self.radius: float | None = None
         self._length: float | None = None
-        self.data = None
+        self.data: Any | None = None
 
     @property
     def lnext(self) -> "Edge":

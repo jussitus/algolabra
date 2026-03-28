@@ -49,20 +49,20 @@ def main(args):
         for i, e in enumerate(room.edges):
             if i == 0:
                 above = (corner[0], corner[1] - 1)
-                if lab.get_corridor_of_square(above) is None and lab.get_room_of_square(above) is None:
+                if lab.get_corridor_of_square(above) is None:
                     room_edges.append((e.org, e.dest))
             if i == 1:
                 right = (corner[0] + 1, corner[1])
-                if lab.get_corridor_of_square(right) is None and lab.get_room_of_square(right) is None:
+                if lab.get_corridor_of_square(right) is None:
                     room_edges.append((e.org, e.dest))
             if i == 2:
                 below = (corner[0], corner[1] + 1)
-                if lab.get_corridor_of_square(below) is None and lab.get_room_of_square(below) is None:
+                if lab.get_corridor_of_square(below) is None:
                     room_edges.append((e.org, e.dest))
             if i == 3:
                 left = (corner[0] - 1, corner[1])
-                if lab.get_corridor_of_square(left) is None and lab.get_room_of_square(left) is None:
-                    room_edges.append((e.org, e.dest)) 
+                if lab.get_corridor_of_square(left) is None:
+                    room_edges.append((e.org, e.dest))
         rectangles.extend(room_edges)
 
     edge_drawer = EdgeDrawer()

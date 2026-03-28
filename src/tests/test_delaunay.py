@@ -6,6 +6,7 @@
 - ...
 
 """
+
 from math import isinf
 from sympy import Matrix
 import pytest
@@ -100,9 +101,11 @@ def test_each_hull_edge_in_only_one_triangle(graph_large):
                 count += 1
         assert count == 1
 
+
 def test_same_number_of_delaunay_and_voronoi_edges(graph_large):
     graph = graph_large
     assert len(graph.delaunay) == len(graph.voronoi)
+
 
 def test_all_non_hull_voronoi_edges_have_finite_geometry(graph_large):
     graph = graph_large
@@ -114,6 +117,7 @@ def test_all_non_hull_voronoi_edges_have_finite_geometry(graph_large):
             assert e.radius > 0
             assert not isinf(e.org[0])
             assert not isinf(e.dest[0])
+
 
 def test_all_hull_voronoi_edges_extend_to_infinity(graph_large):
     graph = graph_large
