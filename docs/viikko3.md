@@ -6,32 +6,30 @@ Vaihdoin incircle-/ccw-testit omaan toteutukseen (`condition_calc.py`). Näköj�
 
 Korjasin bugeja Voronoin diagrammin geometrian laskemisessa.
 
-Refaktoroin Labyrinth-luokkaa. Tähän on mennyt paljon kurssin kannalta aikaa turhaan, kun siinä käytettävä (A\*) on vain pieni osa luokan toiminnasta.
+Refaktoroin Labyrinth-luokkaa. Tähän on mennyt paljon kurssin kannalta aikaa turhaan, kun siinä käytettävä A\* on vain pieni osa luokan toiminnasta.
 
 Jaoin yksikkötestit ja triangulaation invarianttitestit omiin tiedostoihin. Tein lisää yksikkötestejä.
 
-Siirryin takaisin matplotlibin käyttöön. Labyrintin parametrit voi nyt syöttää komentoriviltä.
-
-Siirryin Pythonin logging-moduulin käyttöön. 
+Siirryin takaisin matplotlibin käyttöön. Labyrintin parametrit voi nyt syöttää komentoriviltä. Siirryin Pythonin logging-moduulin käyttöön. 
 
 Aloitin testausraportin teon.
 
 ### Miten ohjelma on edistynyt?
 
-Lopputuloksen kannalta ei oikein mitenkään.
+Lopputuloksen kannalta ei oikein mitenkään. Testikattavuus parantunut paljon.
 
 ### Mitä opin tällä viikolla / tänään?
 
-
+Edge-operaattorien toiminta on selkeytynyt testejä kirjoittaessa.
 
 ### Mikä jäi epäselväksi tai tuottanut vaikeuksia?
 
-Labyrinth-luokan toteutus on 
+Labyrintin toteutus ja piirtäminen on ollut vaikeaa. Refaktorointi auttoi A\*:n oikein toteuttamisessa, mutta luokka alkaa levitä käsiin jälleen kun lisään uutta.
 
 ### Mitä teen seuraavaksi?
 
-Teen lisää yksikkötestejä Edge- ja PlanarGraph-luokille. Yritän saada Labyrinth-luokan sellaiseen kuntoon, että sen piirtäminen halutussa asussa on helppoa.
+Teen loppuja yksikkötestejä Edge- ja PlanarGraph-luokille. Lisään lisää syötteitä invarianttitesteille. Yritän saada Labyrinth-luokan sellaiseen kuntoon, että sen piirtäminen halutussa asussa on helppoa.
 
 ### Aikaa meni
 
-n. 12 tuntia
+n\. 13 tuntia

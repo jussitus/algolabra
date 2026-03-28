@@ -94,10 +94,9 @@ class Edge:
         """
         if self._length is None:
             if self.sym is None or self.org is None or self.sym.org is None:
-                return float("inf") 
+                return float("inf")
             self._length = sqrt(
-                (self.org[0] - self.dest[0]) ** 2
-                + (self.org[1] - self.dest[1]) ** 2
+                (self.org[0] - self.dest[0]) ** 2 + (self.org[1] - self.dest[1]) ** 2
             )
         return self._length
 
@@ -106,7 +105,7 @@ class Edge:
         if self.sym is None:
             dest = (float("inf"), float("inf"))
         else:
-            dest = self.dest    
+            dest = self.dest
         string = f"Edge({self.org} -> {dest})"
         return string
 

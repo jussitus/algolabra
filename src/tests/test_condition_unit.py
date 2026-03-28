@@ -5,6 +5,7 @@ COLLINEAR_FOUR_INT = [(-1, -1), (1, 1), (2, 2), (3, 3)]
 TRIANGLE_INT_TOP_LEFT_RIGHT = [(1, 1), (-1, 1), (1, 0)]
 TRIANGLE_INT_LEFT_RIGHT_TOP = [(-1, -1), (1, -1), (0, 1)]
 
+
 def big(l):
     return [(13**10000 * x, 17**10000 * y) for (x, y) in l]
 
