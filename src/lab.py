@@ -38,21 +38,18 @@ def main(args):
     min_dim = args.min_dim
     lab = Labyrinth(num_rooms, seed, max_dim, min_dim)
 
-
     for c in lab.rooms:
         for e in c.edges:
             pass
-            #print(e.data)
+            # print(e.data)
 
     lines = []
     rectangles = lab.rooms + lab.corridors
     for rec in rectangles:
         for edge in rec.edges:
-            print(edge.data)
-            if edge.data != "door":
+            # print(edge.data)
+            if True or edge.data != "door":
                 lines.append([edge.org, edge.dest])
-
-    
 
     # corridors = []
     # for room in lab.corridors:
@@ -79,7 +76,7 @@ def main(args):
 
     edge_drawer = EdgeDrawer()
     edge_drawer.add_edges(lines, colors="black", linewidths=1.5)
-    #edge_drawer.add_edges(corridors, colors="red", linewidths=1.5)
+    # edge_drawer.add_edges(corridors, colors="red", linewidths=1.5)
     edge_drawer.show()
 
 

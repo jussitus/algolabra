@@ -110,7 +110,7 @@ class Labyrinth:
         edges = []
 #WRONG
         for e in corridor.edges:
-            if self.get_room_of_square(e.org) is not None or self.get_corridor_of_square(e.org) is not None:
+            if self.get_room_of_square(e.org) is not None or self.get_corridor_of_square(e.org) is not None: # wrong square
                 re = self.room_edge_index.get((e.org,e.dest))
                 if re is None:
                     re = self.corridor_edge_index.get((e.org, e.dest))

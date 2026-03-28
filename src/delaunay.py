@@ -45,14 +45,6 @@ class PlanarGraph:
         """Vertices of the graph."""
         return self._vertices
 
-    def extreme_vertices(self) -> dict[str, Point]:
-        """A dict of the extreme left, right, bottom, and top vertices."""
-        min_x = self.vertices[0]
-        max_x = self.vertices[-1]
-        min_y = min(self.vertices, key=(lambda v: v[1]))
-        max_y = max(self.vertices, key=(lambda v: v[1]))
-        return {"min_x": min_x, "max_x": max_x, "min_y": min_y, "max_y": max_y}
-
     @property
     def edges(self) -> list[Edge]:
         """Edges of the graph, including all of the four edges of a quad-edge."""
@@ -184,8 +176,6 @@ def _voronoi(
     delaunay_edges: list[Edge],
     hull: list[Edge],
 ) -> list[Edge]:
-    """Docstring todo MAKE THIS O(N)"""
-    delaunay_set = set(delaunay_edges)
     hull_ccw = set(hull)
     hull_set = set(hull)
     hull_set.update([h.sym for h in hull])
@@ -246,7 +236,7 @@ def _delaunay(
 ) -> tuple[Edge, Edge, list[Edge]]:
     """Docstring to-do"""
     if len(s) < 2:
-        msg = f"len(s)={len(s)} is less than 2"
+        msg = f"Number of points must be at least 2"
         raise ValueError(msg)
     if len(s) == 2:
         a = make_quad_edge(s[0], s[1])

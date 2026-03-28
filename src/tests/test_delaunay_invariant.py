@@ -1,7 +1,7 @@
 from math import isinf
 from sympy import Matrix
 import pytest
-from point_generation import points_circular
+from utils.point_generation import points_circular
 from delaunay import PlanarGraph
 from condition import incircle
 

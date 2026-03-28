@@ -103,7 +103,11 @@ class Edge:
 
     @override
     def __str__(self) -> str:
-        string = f"Edge({self.org} -> {self.dest})"
+        if self.sym is None:
+            dest = (float("inf"), float("inf"))
+        else:
+            dest = self.dest    
+        string = f"Edge({self.org} -> {dest})"
         return string
 
     def __lt__(self, other: Self) -> bool:
