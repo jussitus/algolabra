@@ -2,7 +2,7 @@ from math import isinf
 from sympy import Matrix
 import pytest
 from utils.point_generation import points_circular
-from delaunay import PlanarGraph
+from planar_graph import PlanarGraph
 from condition import incircle
 
 N_SMALL = 100
