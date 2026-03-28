@@ -93,13 +93,12 @@ class Edge:
         Calculated when first accessed. Can be `float('inf')` for outer Voronoi edges.
         """
         if self._length is None:
-            if self.org is not None and self.dest is not None:  # pyright: ignore[reportUnnecessaryComparison]
-                self._length = sqrt(
-                    (self.org[0] - self.dest[0]) ** 2
-                    + (self.org[1] - self.dest[1]) ** 2
-                )
-            else:
-                return float("inf")  # infinite voronoi edge
+            if self.sym is None or self.org is None or self.sym.org is None:
+                return float("inf") 
+            self._length = sqrt(
+                (self.org[0] - self.dest[0]) ** 2
+                + (self.org[1] - self.dest[1]) ** 2
+            )
         return self._length
 
     @override

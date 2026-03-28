@@ -18,7 +18,7 @@ from condition import (
     valid,
 )
 from point import Point, PointInt
-from log_utils import timer, log_after_state
+from utils.log_utils import timer, log_after_state
 
 
 class PlanarGraph:
@@ -38,7 +38,7 @@ class PlanarGraph:
         self._triangles: list[tuple[Edge, Edge, Edge]] = []
         self._voronoi: list[Edge] = []
         self._mst_delaunay: list[Edge] = []
-        self._mst_voronoi: list[Edge] = []
+        #self._mst_voronoi: list[Edge] = []
 
     @property
     def vertices(self) -> list[Point]:

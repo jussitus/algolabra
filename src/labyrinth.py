@@ -1,11 +1,10 @@
-from collections import defaultdict
 from enum import Enum, auto
 import random
 from math import sqrt, floor
 import heapq as hq
 from typing import Self
 from delaunay import PlanarGraph
-from edge import Edge, make_quad_edge, splice
+from edge import Edge, make_quad_edge, splice, delete_quad_edge
 from point import Point, PointInt
 
 
@@ -62,11 +61,13 @@ class Labyrinth:
         self.seed: int = seed
         self.max_dim: int = max_dim
         self.min_dim: int = min_dim
-        self.gap: int = 1
+        self.gap: int = 5
         self.rooms: list[Room]
         self.room_squares: list[list[Room | None]]
         self.room_centers: list[PointInt]
         self.rooms, self.room_squares, self.room_centers = self._generate_rooms()
+        self.room_edge_index = self._index_room_edges()
+        self.corridor_edge_index = {}
         self.corridor_squares: list[list[Corridor | None]] = [
             [None] * len(self.room_squares) for _ in range(len(self.room_squares))
         ]
@@ -93,17 +94,37 @@ class Labyrinth:
             path: Path | None = path_finder.find_path(edge.org, edge.dest)
             current = path
             while current is not None:
-                # todo: add corridor room connect logic to Rectangle
-                if self.get_room_of_square(current.current) is None:
-                if self.get_corridor_of_square(current.current) is None:
+                if self.get_corridor_of_square(current.current) is None:  
                     corridor = Corridor(current.current)
                     self.corridor_squares[current.current[1]][
                         current.current[0]
                     ] = corridor
-                    corridors.append(corridor)
+                    self._index_corridor_edges(corridor)
+                    self._link_corridor(corridor)
+                    if self.get_room_of_square(current.current) is None:
+                        corridors.append(corridor)
                 current = current.path
         return corridors
 
+    def _link_corridor(self, corridor):
+        edges = []
+#WRONG
+        for e in corridor.edges:
+            if self.get_room_of_square(e.org) is not None or self.get_corridor_of_square(e.org) is not None:
+                re = self.room_edge_index.get((e.org,e.dest))
+                if re is None:
+                    re = self.corridor_edge_index.get((e.org, e.dest))
+                if re is not None:
+                    splice(e, re)
+                    splice(e.sym, re.sym)
+                    re.data = "door"
+                    re.sym.data = "door"
+                    edges.append(re)
+                else:
+                    edges.append(e)
+            else:
+                edges.append(e)
+        corridor.edges = edges
     def get_room_of_square(self, square: PointInt):
         return self.room_squares[square[1]][square[0]]
 
@@ -116,7 +137,18 @@ class Labyrinth:
         connections: list[Edge] = d.mst_delaunay
         return connections
 
-
+    def _index_room_edges(self):
+        index = {}
+        for room in self.rooms:
+            for e in room.edges:
+                index[(e.org, e.dest)] = e
+                index[(e.dest, e.org)] = e.sym
+        return index
+    
+    def _index_corridor_edges(self,corridor):
+        for e in corridor.edges:
+            self.corridor_edge_index[(e.org, e.dest)] = e
+            self.corridor_edge_index[(e.dest, e.org)] = e.sym
 class Direction(Enum):
     NORTH = auto()
     EAST = auto()
@@ -281,9 +313,6 @@ class RoomGenerator:
                 occupied[corner[1] + h][corner[0] + w] = True
                 if w >= 0 and h >= 0 and w < width and h < height:
                     room_squares[corner[1] + h][corner[0] + w] = room
-
-        for edge in room.edges:
-            edge.data = {room}
         return room
 
     def _room_fits(self, occupied, corner, width, height):

@@ -5,20 +5,8 @@ COLLINEAR_FOUR_INT = [(-1, -1), (1, 1), (2, 2), (3, 3)]
 TRIANGLE_INT_TOP_LEFT_RIGHT = [(1, 1), (-1, 1), (1, 0)]
 TRIANGLE_INT_LEFT_RIGHT_TOP = [(-1, -1), (1, -1), (0, 1)]
 
-""" 
-KESKEN
-
-"""
-
-
 def big(l):
-    return [
-        (
-            12345678901234567891234567890123456789 * x,
-            12345678901234567891234567890123456789 * y,
-        )
-        for (x, y) in l
-    ]
+    return [(13**10000 * x, 17**10000 * y) for (x, y) in l]
 
 
 def test_ccw_collinear_int():
