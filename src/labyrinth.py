@@ -61,7 +61,7 @@ class Labyrinth:
         self.seed: int = seed
         self.max_dim: int = max_dim
         self.min_dim: int = min_dim
-        self.gap: int = 5
+        self.gap: int = 3
         self.rooms: list[Room]
         self.room_squares: list[list[Room | None]]
         self.room_centers: list[PointInt]
@@ -218,7 +218,12 @@ class PathFinder:
             if self._closed(closed_list, neighbor):
                 continue
             weight = 0.5 if self._is_corridor(neighbor) else 1
-            g = current_path.g_length + weight
+            c_direction = current_path.direction
+            if c_direction is None or direction == c_direction:
+                penalty = 0
+            else:
+                penalty = 0.2
+            g = current_path.g_length + weight + penalty
             h = self._heuristic(neighbor, end)
             path = Path(g + h, g, neighbor, direction, current_path)
             hq.heappush(open_list, path)
@@ -235,7 +240,7 @@ class PathFinder:
 
     def _heuristic(self, a: PointInt, b: PointInt):
         # return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+        return 0.5 * (abs(a[0] - b[0]) + abs(a[1] - b[1]))
         # return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
     def _neighbors(self, square: PointInt) -> list[tuple[PointInt, Direction]]:
