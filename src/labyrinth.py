@@ -5,7 +5,7 @@ import heapq as hq
 from typing import Self
 from planar_graph import PlanarGraph
 from edge import Edge, make_quad_edge, splice, delete_quad_edge
-from point import Point, PointInt
+from point import PointInt
 
 
 class Rectangle:
@@ -30,19 +30,19 @@ class Rectangle:
         return edges, corner_edge
 
     def add_side(
-        self, edges: list[Edge], current: Edge, length: int, displacement: Point
+        self, edges: list[Edge], current_edge: Edge, length: int, displacement: PointInt
     ) -> Edge:
         for _ in range(length):
-            next_org = current.dest
+            next_org = current_edge.dest
             next_dest = (
                 next_org[0] + displacement[0],
                 next_org[1] + displacement[1],
             )
-            next = make_quad_edge(next_org, next_dest)
-            splice(current.sym, next)
-            current = next
-            edges.append(current)
-        return current
+            next_edge = make_quad_edge(next_org, next_dest)
+            splice(current_edge.sym, next_edge)
+            current_edge = next_edge
+            edges.append(current_edge)
+        return current_edge
 
 
 class Room(Rectangle):
@@ -91,21 +91,24 @@ class Labyrinth:
         corridors: list[Corridor] = []
         path_finder = PathFinder(self)
         for edge in connections:
-            path: Path | None = path_finder.find_path(edge.org, edge.dest)
+            path: Path | None = path_finder.find_path(edge.org, edge.dest) # pyright: ignore[reportArgumentType]
             current = path
             while current is not None:
-                if self.get_corridor_of_square(current.current) is None and self.get_room_of_square(current.current) is None:
+                if (
+                    self.get_corridor_of_square(current.current) is None
+                    and self.get_room_of_square(current.current) is None
+                ):
                     corridor = Corridor(current.current)
                     self.corridor_squares[current.current[1]][current.current[0]] = (
                         corridor
                     )
-                    self._link_corridor(corridor, current.direction)
+                    self._link_corridor(corridor)
                     self._index_corridor_edges(corridor)
                     corridors.append(corridor)
                 current = current.path
         return corridors
 
-    def _link_corridor(self, corridor, direction):
+    def _link_corridor(self, corridor):
         edges = []
         for e in corridor.edges:
             re = self.room_edge_index.get((e.org, e.dest))
@@ -114,6 +117,7 @@ class Labyrinth:
             if re is not None:
                 splice(e, re)
                 splice(e.sym, re.sym)
+                delete_quad_edge(e)
                 re.data = "shared"
                 re.sym.data = "shared"
                 edges.append(re)
@@ -300,8 +304,7 @@ class RoomGenerator:
             return point_in_circle(max_pos)
         if self.shape == "square":
             return point_in_square(max_pos)
-        else:
-            raise ValueError("Bad shape")
+        raise ValueError("Bad shape")
 
     def _create_and_occupy_room(
         self, occupied, room_squares, size, corner, width, height

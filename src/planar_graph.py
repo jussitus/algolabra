@@ -144,10 +144,13 @@ class PlanarGraph:
         return left, right, edges, delaunay_edges
 
     @timer(level=logging.DEBUG)
-    def _compute_voronoi(self):
-        """REDO DOCSTRING Computes the origin (org) and destination (dest) coordinates of the Voronoi edges, and the radius of the circumcircle of centered around the origin.
+    def _compute_voronoi(self) -> list[Edge]:
+        """Computes the origin and destination coordinates of the Voronoi edges, and the radius of the circumcircle of centered around the origin.
 
         The outer edges of the Voronoi diagram extend to infinity, which is treated as a single point.
+
+        Returns:
+            list of the Voronoi edges
         """
         return _voronoi(self.triangles, self.delaunay, self.hull)
 
@@ -176,6 +179,18 @@ def _voronoi(
     delaunay_edges: list[Edge],
     hull: list[Edge],
 ) -> list[Edge]:
+    """Populates the origin and destination fields of the Voronoi edges by computing the circumcenter of the defining Delaunay triangle.
+
+    Additionally records the circumcircle radius.
+
+    Args:
+        triangles: Triangles in the triangulation.
+        delaunay_edges: Canonical edges of the triangulation.
+        hull: Hull of the triangulation.
+
+    Returns:
+        A list of the Voronoi edges.
+    """
     hull_ccw = set(hull)
     hull_set = set(hull)
     hull_set.update([h.sym for h in hull])
@@ -232,36 +247,47 @@ def _prim(graph: list[Edge]) -> list[Edge]:
 
 
 def _delaunay(
-    s: list[Point], edges: list[Edge], bad_edges: list[Edge]
+    points: list[Point], edges: list[Edge], bad_edges: list[Edge]
 ) -> tuple[Edge, Edge, list[Edge]]:
-    """Docstring to-do"""
-    if len(s) < 2:
-        msg = f"Number of points must be at least 2"
+    """Computes the Delaunay triangulation of a set of points using the Guibas-Stolfi divide-and-conquer algorithm.
+
+    Recursively divides the set in half, until the base cases are reached. The merge loop joins the two halves, deleting edges, and adding edges between the two halves from bottom to top, so that the Delaunay condition is preserved.
+
+    Args:
+        points: a list of 2D integer-valued points
+        edges: a global list of edges in the triangulation
+        bad_edges: a global list of edges that are invalidated during the merge loop
+
+    Returns:
+        a 3-tuple of consisting of the left and right edges of the triangulation, and the list of invalidated edges to be removed
+    """
+    if len(points) < 2:
+        msg = "Number of points must be at least 2"
         raise ValueError(msg)
-    if len(s) == 2:
-        a = make_quad_edge(s[0], s[1])
+    if len(points) == 2:
+        a = make_quad_edge(points[0], points[1])
         edges.extend([a, a.sym, a.rot, a.tor])
         return (a, a.sym, bad_edges)
-    if len(s) == 3:
-        a = make_quad_edge(s[0], s[1])
+    if len(points) == 3:
+        a = make_quad_edge(points[0], points[1])
         edges.extend([a, a.sym, a.rot, a.tor])
-        b = make_quad_edge(s[1], s[2])
+        b = make_quad_edge(points[1], points[2])
         edges.extend([b, b.sym, b.rot, b.tor])
         splice(a.sym, b)
-        if ccw(s[0], s[1], s[2]):
+        if ccw(points[0], points[1], points[2]):
             c = connect(b, a)
             edges.extend([c, c.sym, c.rot, c.tor])
             return (a, b.sym, bad_edges)
-        if ccw(s[0], s[2], s[1]):
+        if ccw(points[0], points[2], points[1]):
             c = connect(b, a)
             edges.extend([c, c.sym, c.rot, c.tor])
             return (c.sym, c, bad_edges)
 
         return (a, b.sym, bad_edges)
 
-    mid = len(s) // 2
-    (ldo, ldi, _) = _delaunay(s[:mid], edges, bad_edges)
-    (rdi, rdo, _) = _delaunay(s[mid:], edges, bad_edges)
+    mid = len(points) // 2
+    (ldo, ldi, _) = _delaunay(points[:mid], edges, bad_edges)
+    (rdi, rdo, _) = _delaunay(points[mid:], edges, bad_edges)
     while True:
         if left_of(rdi.org, ldi):
             ldi = ldi.lnext

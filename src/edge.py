@@ -115,7 +115,19 @@ class Edge:
 
 
 def make_quad_edge(org: Point, dest: Point) -> Edge:
-    """Doc string to do"""
+    """
+    Creates and links the four edges in the quad-edge structure.
+
+    The edges are the principal edge, its symmetric edge, its rotated edge and the symmetric rotated edge. Dual flag is set for the rotated edges.
+
+    Args:
+        org: origin of the principal edge
+        dest: destination of the principal edge
+
+    Returns:
+        the principal edge
+
+    """
     e = Edge()
     e_sym = Edge()
     e_rot = Edge()
@@ -153,7 +165,13 @@ def make_quad_edge(org: Point, dest: Point) -> Edge:
 
 
 def splice(a: Edge, b: Edge):
-    """Docstring to do"""
+    """
+    Splices two edges such that [something here, onext ring...]
+
+    Args:
+        a: first edge
+        b: second edge
+    """
     alpha = a.onext.rot
     beta = b.onext.rot
 
@@ -162,7 +180,15 @@ def splice(a: Edge, b: Edge):
 
 
 def connect(a: Edge, b: Edge) -> Edge:
-    """Docstring to do"""
+    """Creates an edge connecting two edges.
+
+    Args:
+        a: first edge
+        b: second edge
+
+    Returns:
+        an edge from `a.dest` to `b.org`
+    """
     e = make_quad_edge(a.dest, b.org)
     splice(e, a.lnext)
     splice(e.sym, b)
@@ -170,23 +196,53 @@ def connect(a: Edge, b: Edge) -> Edge:
 
 
 def delete_quad_edge(e: Edge):
-    """Docstring to do"""
+    """
+    Disconnects an edge from the graph.
+
+    Only severs the connections to other edges. Does not delete the edge from memory.
+
+    Args:
+        e: edge to be deleted from the graph
+    """
     splice(e, e.oprev)
     splice(e.sym, e.sym.oprev)
 
 
 def triangle_ccw(e: Edge) -> tuple[Edge, Edge, Edge]:
-    """Docstring to do"""
+    """
+    Gives the counterclockwise triangle the edge is part of.
+
+    Args:
+        e: edge
+
+    Returns:
+        a list of three edges
+    """
     return (e, e.lnext, e.lnext.lnext)
 
 
 def triangle_cw(e: Edge) -> tuple[Edge, Edge, Edge]:
-    """Docstring to do"""
+    """
+    Gives the clockwise triangle the edge is part of.
+
+    Args:
+        e: edge
+
+    Returns:
+        a list of three edges
+    """
     return (e, e.rnext, e.rnext.rnext)
 
 
 def circumcircle(e: Edge) -> tuple[Point, float]:
-    """Docstring to do"""
+    """Calculates the circumcenter and radius of the counterclockwise triangle the edge is part of.
+
+    Args:
+        e: edge
+
+    Returns:
+        a 2-tuple of the circumcenter and the radius
+    """
     a, b, c = triangle_ccw(e)
     d = 2 * (
         a.org[0] * (b.org[1] - c.org[1])

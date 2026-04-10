@@ -4,7 +4,7 @@ Testauksessa käytetään Pytestiä.
 
 (tähä jotain)
 
-Testit voi ajaa (jotain tähän)
+Testit voi ajaa komennolla `poetry run pytest`.
 
 ## Yksikkötestaus
 

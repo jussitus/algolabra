@@ -33,7 +33,7 @@ def test_constructor_computed_attributes_are_empty(points):
 def test_constructor_input_points_and_vertices_have_same_length(points):
     g = PlanarGraph(points)
     assert len(points) == len(g.vertices)
-    
+
 
 def test_triangle_non_collinear():
     g = PlanarGraph([(0, 0), (0, 1), (1, 0)])

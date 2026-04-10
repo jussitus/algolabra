@@ -9,7 +9,7 @@ logger.setLevel(logging.DEBUG)
 
 from argparse import ArgumentParser
 from graphics import EdgeDrawer
-from labyrinth import Labyrinth
+from labyrinth import Labyrinth, Room
 
 
 def parse_arguments():
@@ -28,9 +28,7 @@ def parse_arguments():
     parser.add_argument(
         "-md", "--min-dim", default=2, type=int, help="minimum width/height of rooms"
     )
-    parser.add_argument(
-        "-g", "--gap", default=1, type=int, help="gap between rooms"
-    )
+    parser.add_argument("-g", "--gap", default=1, type=int, help="gap between rooms")
     return parser.parse_args()
 
 
@@ -42,29 +40,19 @@ def main(args):
     gap = args.gap
     lab = Labyrinth(num_rooms, seed, max_dim, min_dim, gap)
 
-    
-    first = lab.rooms[0].edges[0]
-    lines = [[first.org, first.dest]]
-    current = first.lnext
-    lines.append([current.org, current.dest])
-    while True:
-        if current is not current.lnext and current is not first:
-            current = current.lnext
-            print(current)
-            if current.data != "shared":
-                lines.append([current.org, current.dest])
-        else:
-            break
-    # lines = []
-    # rectangles = lab.rooms + lab.corridors
-    # for rec in rectangles:
-    #     for edge in rec.edges:
-    #         if edge.data != "shared":
-    #             lines.append([edge.org, edge.dest])
-
+    walls = []
+    shared = []
+    rectangles = lab.rooms + lab.corridors
+    for rec in rectangles:
+        for edge in rec.edges:
+            if edge.data != "shared":
+                walls.append([edge.org, edge.dest])
+            else:
+                shared.append([edge.org, edge.dest])
 
     edge_drawer = EdgeDrawer()
-    edge_drawer.add_edges(lines, colors="black", linewidths=1.5)
+    edge_drawer.add_edges(walls, colors="black", linewidths=1.5)
+    edge_drawer.add_edges(shared, colors="black", linewidths=1.5, alpha=0.2)
     edge_drawer.show()
 
 

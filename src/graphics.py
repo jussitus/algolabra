@@ -11,10 +11,10 @@ class EdgeDrawer:
 
     def add_edges(self, edges: list[tuple[Point]], **kwargs):
         lc: LineCollection = LineCollection(edges, **kwargs)
-        _ = self._ax.add_collection(lc)
+        self._ax.add_collection(lc)
 
     def show(self):
-        _ = self._ax.invert_yaxis()
-        _ = self._ax.axis("equal")
-        _ = self._ax.autoscale()
-        _ = plt.show()
+        self._ax.invert_yaxis()
+        self._ax.axis("equal")
+        self._ax.autoscale()
+        plt.show()
