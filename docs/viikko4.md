@@ -16,7 +16,7 @@ En ole edistynyt testaust/toteutus-dokumentoinnin suhteen.
 
 ## Mitä teen seuraavaksi?
 
-Kirjoitan vaadittavat dokumentit siihen kuntoon, että niitä tarvitsee vain päivittää tarvittaessa. Teen kaikki testit loppuun (kattavat yksikkötestit incircle, jne. peruspalikoille ja testit yksikkötestit labyrintille, ja lisään jotain e2e testejä tai jotain).
+Kirjoitan vaadittavat dokumentit siihen kuntoon, että niitä tarvitsee vain päivittää tarvittaessa. Teen kaikki testit loppuun (kattavat yksikkötestit incircle, jne. peruspalikoille ja testit moduulille labyrinth, ja lisään jotain e2e testejä, tms.)
 
 ## Aikaa meni
 
