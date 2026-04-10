@@ -28,6 +28,9 @@ def parse_arguments():
     parser.add_argument(
         "-md", "--min-dim", default=2, type=int, help="minimum width/height of rooms"
     )
+    parser.add_argument(
+        "-g", "--gap", default=1, type=int, help="gap between rooms"
+    )
     return parser.parse_args()
 
 
@@ -36,47 +39,32 @@ def main(args):
     seed = args.seed
     max_dim = args.max_dim
     min_dim = args.min_dim
-    lab = Labyrinth(num_rooms, seed, max_dim, min_dim)
+    gap = args.gap
+    lab = Labyrinth(num_rooms, seed, max_dim, min_dim, gap)
 
-    for c in lab.rooms:
-        for e in c.edges:
-            pass
-            # print(e.data)
+    
+    first = lab.rooms[0].edges[0]
+    lines = [[first.org, first.dest]]
+    current = first.lnext
+    lines.append([current.org, current.dest])
+    while True:
+        if current is not current.lnext and current is not first:
+            current = current.lnext
+            print(current)
+            if current.data != "shared":
+                lines.append([current.org, current.dest])
+        else:
+            break
+    # lines = []
+    # rectangles = lab.rooms + lab.corridors
+    # for rec in rectangles:
+    #     for edge in rec.edges:
+    #         if edge.data != "shared":
+    #             lines.append([edge.org, edge.dest])
 
-    lines = []
-    rectangles = lab.rooms + lab.corridors
-    for rec in rectangles:
-        for edge in rec.edges:
-            # print(edge.data)
-            if True or edge.data != "door":
-                lines.append([edge.org, edge.dest])
-
-    # corridors = []
-    # for room in lab.corridors:
-    #     room_edges = []
-    #     corner = room.corner
-    #     for i, e in enumerate(room.edges):
-    #         if i == 0:
-    #             above = (corner[0], corner[1] - 1)
-    #             if lab.get_corridor_of_square(above) is None:
-    #                 room_edges.append((e.org, e.dest))
-    #         if i == 1:
-    #             right = (corner[0] + 1, corner[1])
-    #             if lab.get_corridor_of_square(right) is None:
-    #                 room_edges.append((e.org, e.dest))
-    #         if i == 2:
-    #             below = (corner[0], corner[1] + 1)
-    #             if lab.get_corridor_of_square(below) is None:
-    #                 room_edges.append((e.org, e.dest))
-    #         if i == 3:
-    #             left = (corner[0] - 1, corner[1])
-    #             if lab.get_corridor_of_square(left) is None:
-    #                 room_edges.append((e.org, e.dest))
-    #     corridors.extend(room_edges)
 
     edge_drawer = EdgeDrawer()
     edge_drawer.add_edges(lines, colors="black", linewidths=1.5)
-    # edge_drawer.add_edges(corridors, colors="red", linewidths=1.5)
     edge_drawer.show()
 
 

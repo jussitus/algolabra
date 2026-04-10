@@ -56,12 +56,12 @@ class Corridor(Rectangle):
 
 
 class Labyrinth:
-    def __init__(self, num_rooms: int, seed: int, max_dim: int, min_dim: int):
+    def __init__(self, num_rooms: int, seed: int, max_dim: int, min_dim: int, gap: int):
         self.num_rooms: int = num_rooms
         self.seed: int = seed
         self.max_dim: int = max_dim
         self.min_dim: int = min_dim
-        self.gap: int = 3
+        self.gap: int = gap
         self.rooms: list[Room]
         self.room_squares: list[list[Room | None]]
         self.room_centers: list[PointInt]
@@ -82,7 +82,7 @@ class Labyrinth:
         list[PointInt],
     ]:
         room_generator = RoomGenerator(
-            self.num_rooms, self.min_dim, self.max_dim, self.gap, "square", self.seed
+            self.num_rooms, self.min_dim, self.max_dim, self.gap, "circle", self.seed
         )
         return room_generator.run()
 
@@ -94,37 +94,29 @@ class Labyrinth:
             path: Path | None = path_finder.find_path(edge.org, edge.dest)
             current = path
             while current is not None:
-                if self.get_corridor_of_square(current.current) is None:
+                if self.get_corridor_of_square(current.current) is None and self.get_room_of_square(current.current) is None:
                     corridor = Corridor(current.current)
                     self.corridor_squares[current.current[1]][current.current[0]] = (
                         corridor
                     )
+                    self._link_corridor(corridor, current.direction)
                     self._index_corridor_edges(corridor)
-                    self._link_corridor(corridor)
-                    if self.get_room_of_square(current.current) is None:
-                        corridors.append(corridor)
+                    corridors.append(corridor)
                 current = current.path
         return corridors
 
-    def _link_corridor(self, corridor):
+    def _link_corridor(self, corridor, direction):
         edges = []
-        # WRONG
         for e in corridor.edges:
-            if (
-                self.get_room_of_square(e.org) is not None
-                or self.get_corridor_of_square(e.org) is not None
-            ):  # wrong square
-                re = self.room_edge_index.get((e.org, e.dest))
-                if re is None:
-                    re = self.corridor_edge_index.get((e.org, e.dest))
-                if re is not None:
-                    splice(e, re)
-                    splice(e.sym, re.sym)
-                    re.data = "door"
-                    re.sym.data = "door"
-                    edges.append(re)
-                else:
-                    edges.append(e)
+            re = self.room_edge_index.get((e.org, e.dest))
+            if re is None:
+                re = self.corridor_edge_index.get((e.org, e.dest))
+            if re is not None:
+                splice(e, re)
+                splice(e.sym, re.sym)
+                re.data = "shared"
+                re.sym.data = "shared"
+                edges.append(re)
             else:
                 edges.append(e)
         corridor.edges = edges
