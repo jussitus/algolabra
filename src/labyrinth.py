@@ -91,7 +91,7 @@ class Labyrinth:
         corridors: list[Corridor] = []
         path_finder = PathFinder(self)
         for edge in connections:
-            path: Path | None = path_finder.find_path(edge.org, edge.dest) # pyright: ignore[reportArgumentType]
+            path: Path | None = path_finder.find_path(edge.org, edge.dest)  # pyright: ignore[reportArgumentType]
             current = path
             while current is not None:
                 if (
