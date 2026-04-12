@@ -2,7 +2,7 @@
 
 ### Mitä olen tehnyt tällä viikolla?
 
-Lisäsin docstringeja puuttuviin funktioihin. Lisäsin pari yksikkötestiä. Sain Labyrinth-koodin lisäämään käytäväruutuja niin, että eri ruutujen yhteiset sivut on merkitty, joten ne voi jättää piirtämättä. 
+Lisäsin docstringeja puuttuviin funktioihin. Lisäsin pari yksikkötestiä. Sain Labyrinth-koodin lisäämään käytäväruutuja niin, että eri ruutujen yhteiset sivut on merkitty, joten ne voi jättää piirtämättä. Yksinkertaisin Labyrinth-koodia.
 
 ## Miten ohjelma on edistynyt?
 
@@ -14,7 +14,7 @@ En oikein mitään.
 
 ## Mikä on tuottanut vaikeuksia?
 
-En ole edistynyt testaust/toteutus-dokumentoinnin suhteen.
+Aloitin pääsiäistauon jälkeen myöhään, en ole saanut paljoa tehtyä. En ole aloittanut toteutusdokumentin tekoa. On paljon yksinkertaisempaa keksiä invarianttitestejä kuin yksikkötestejä, ja en tiedä miten yksinkertaisia yksikkötestejä vaaditaan. En ole aloittanut Labyrinth-luokan testien enkä dokumentoinnin tekoa, kun sen toimintaperiaate on vaihdellut paljon, mutta olen nyt päätynyt A\*:een, vaikka sille on vaikea toteuttaa mitään "suosi aina olemassaolevaa käytävää"-tyyppistä toimintaa. Vaikeuksia myös dokumentoinnin muotoilussa.
 
 ## Mitä teen seuraavaksi?
 
@@ -22,6 +22,6 @@ Kirjoitan vaadittavat dokumentit siihen kuntoon, että niitä tarvitsee vain pä
 
 ## Aikaa meni
 
-n. 2-3 tuntia
+n. 3-4 tuntia
 
 
