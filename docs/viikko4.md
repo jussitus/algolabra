@@ -14,7 +14,7 @@ En oikein mitään.
 
 ## Mikä on tuottanut vaikeuksia?
 
-Aloitin pääsiäistauon jälkeen myöhään, en ole saanut paljoa tehtyä. En ole aloittanut toteutusdokumentin tekoa. On paljon yksinkertaisempaa keksiä invarianttitestejä kuin yksikkötestejä, ja en tiedä miten yksinkertaisia yksikkötestejä vaaditaan. En ole aloittanut Labyrinth-luokan testien enkä dokumentoinnin tekoa, kun sen toimintaperiaate on vaihdellut paljon, mutta olen nyt päätynyt A\*:een, vaikka sille on vaikea toteuttaa mitään "suosi aina olemassaolevaa käytävää"-tyyppistä toimintaa. Vaikeuksia myös dokumentoinnin muotoilussa.
+Aloitin pääsiäistauon jälkeen myöhään, en ole saanut paljoa tehtyä. En ole aloittanut toteutusdokumentin tekoa. On ollut helpompaa keksiä järkeviä invarianttitestejä kuin yksikkötestejä, ja en tiedä kuinka yksinkertaisia yksikkötestejä vaaditaan. En ole aloittanut Labyrinth-luokan testien enkä dokumentoinnin tekoa, kun sen toimintaperiaate on vaihdellut paljon, mutta olen nyt päätynyt A\*:een, vaikka sille on vaikea toteuttaa mitään "suosi aina olemassaolevaa käytävää"-tyyppistä toimintaa. Vaikeuksia myös dokumentoinnin muotoilussa.
 
 ## Mitä teen seuraavaksi?
 
