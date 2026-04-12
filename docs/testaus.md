@@ -1,25 +1,16 @@
 # Testaus
-
+(kesken)
 Testauksessa käytetään Pytestiä. 
-
-(tähä jotain)
 
 Testit voi ajaa komennolla `poetry run pytest`.
 
 ## Yksikkötestaus
 
-
+Yksikkötestien testikattavuus:
 <img src="testaus.png">
 
-Moduulin `edge` yksikkötestit testaavat, että (yksittäinen Edge oikein, quad-edgen yhteydet oikein, splice / connect / delete toimii oikein, ...)
-
-(planar_graph testit testaa että luokka laskee perustapaukset oikein)
-
-(condition)
-
-(labyrinth)
+Yksikkötestit testaavat Edge- ja PlanarGraph-luokkien konstruktoreita ja metodeja hyvin pienillä syötteillä.
 
 ## Invarianttitestaus
 
-Suurelle tasoverkolle blaa blaa invariantteja joiden laskeminen vie paljon aikaa, joten blaa blaa erikokoisilla syötteillä erivaativille testeille
-
+Yksikkötestien lisäksi testataan Delaunay-triangulaatioon liittyviä geometrisia invariantteja, joista tärkein on, että jokaisen triangulaation kolmion määrittämän ympyrän kehän sisäpuolella ei ole muita pisteitä. Lisäksi kaikkien sivujen määrä voidaan laskea uloimmaisten sivujen lukumäärästä. Pienillä syötteillä testit toteutetaan `sympy`-kirjaston avulla, suuremilla syötteillä ohjelman oman `ccw`-testin avulla.

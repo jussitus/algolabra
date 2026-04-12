@@ -53,7 +53,7 @@ def test_delaunay_condition_independent(graph_small):
         triangle_vertices = [v.org for v in t]
         for v in graph.vertices:
             if v not in triangle_vertices:
-                assert not incircle(
+                assert not slow_incircle(
                     triangle_vertices[0], triangle_vertices[1], triangle_vertices[2], v
                 )
 
