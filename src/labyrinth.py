@@ -5,7 +5,7 @@ import heapq as hq
 from typing import Self
 from planar_graph import PlanarGraph
 from edge import Edge, make_quad_edge, splice, delete_quad_edge
-from point import PointInt
+from point import PointInt, Point
 
 
 class Rectangle:
@@ -63,22 +63,17 @@ class Labyrinth:
         self.min_dim: int = min_dim
         self.gap: int = gap
         self.rooms: list[Room]
-        self.room_squares: list[list[Room | None]]
+        self.squares: list[list[Rectangle | None]]
         self.room_centers: list[PointInt]
-        self.rooms, self.room_squares, self.room_centers = self._generate_rooms()
-        self.room_edge_index = self._index_room_edges()
-        self.corridor_edge_index = {}
-        self.corridor_squares: list[list[Corridor | None]] = [
-            [None] * len(self.room_squares) for _ in range(len(self.room_squares))
-        ]
-
+        self.rooms, self.squares, self.room_centers = self._generate_rooms()
+        self.edges: dict[tuple[Point, Point], Edge] = self._index_room_edges()
         self.corridors: list[Corridor] = self._create_corridors()
 
     def _generate_rooms(
         self,
     ) -> tuple[
         list[Room],
-        list[list[Room | None]],
+        list[list[Rectangle | None]],
         list[PointInt],
     ]:
         room_generator = RoomGenerator(
@@ -94,26 +89,19 @@ class Labyrinth:
             path: Path | None = path_finder.find_path(edge.org, edge.dest)  # pyright: ignore[reportArgumentType]
             current = path
             while current is not None:
-                if (
-                    self.get_corridor_of_square(current.current) is None
-                    and self.get_room_of_square(current.current) is None
-                ):
+                if self.get_square(current.current) is None:
                     corridor = Corridor(current.current)
-                    self.corridor_squares[current.current[1]][current.current[0]] = (
-                        corridor
-                    )
+                    self.squares[current.current[1]][current.current[0]] = corridor
                     self._link_corridor(corridor)
                     self._index_corridor_edges(corridor)
                     corridors.append(corridor)
                 current = current.path
         return corridors
 
-    def _link_corridor(self, corridor):
-        edges = []
+    def _link_corridor(self, corridor: Corridor):
+        edges: list[Edge] = []
         for e in corridor.edges:
-            re = self.room_edge_index.get((e.org, e.dest))
-            if re is None:
-                re = self.corridor_edge_index.get((e.org, e.dest))
+            re = self.edges.get((e.org, e.dest))
             if re is not None:
                 splice(e, re)
                 splice(e.sym, re.sym)
@@ -125,11 +113,8 @@ class Labyrinth:
                 edges.append(e)
         corridor.edges = edges
 
-    def get_room_of_square(self, square: PointInt):
-        return self.room_squares[square[1]][square[0]]
-
-    def get_corridor_of_square(self, square: PointInt):
-        return self.corridor_squares[square[1]][square[0]]
+    def get_square(self, square: PointInt):
+        return self.squares[square[1]][square[0]]
 
     def _connect_rooms(self, room_centers: list[PointInt]) -> list[Edge]:
         d = PlanarGraph(room_centers)
@@ -137,18 +122,18 @@ class Labyrinth:
         connections: list[Edge] = d.mst_delaunay
         return connections
 
-    def _index_room_edges(self):
-        index = {}
+    def _index_room_edges(self) -> dict[tuple[Point, Point], Edge]:
+        index: dict[tuple[Point, Point], Edge] = {}
         for room in self.rooms:
             for e in room.edges:
                 index[(e.org, e.dest)] = e
                 index[(e.dest, e.org)] = e.sym
         return index
 
-    def _index_corridor_edges(self, corridor):
+    def _index_corridor_edges(self, corridor: Corridor):
         for e in corridor.edges:
-            self.corridor_edge_index[(e.org, e.dest)] = e
-            self.corridor_edge_index[(e.dest, e.org)] = e.sym
+            self.edges[(e.org, e.dest)] = e
+            self.edges[(e.dest, e.org)] = e.sym
 
 
 class Direction(Enum):
@@ -183,7 +168,7 @@ class PathFinder:
 
     def find_path(self, start: PointInt, end: PointInt) -> Path | None:
         first = Path(self._heuristic(start, end), 0, start, None, None)
-        size = len(self.labyrinth.corridor_squares)
+        size = len(self.labyrinth.squares)
         closed_list = [[False] * size for _ in range(size)]
         open_list = [first]
         while len(open_list) > 0:
@@ -224,14 +209,20 @@ class PathFinder:
             path = Path(g + h, g, neighbor, direction, current_path)
             hq.heappush(open_list, path)
 
-    def _is_corridor(self, square):
-        return self.labyrinth.get_corridor_of_square(square) is not None
+    def _is_corridor(self, square: PointInt) -> bool:
+        corridor = self.labyrinth.get_square(square)
+        if corridor is not None and isinstance(corridor, Corridor):
+            return True
+        return False
 
-    def _is_room(self, square):
-        return self.labyrinth.get_room_of_square(square) is not None
+    def _is_room(self, square: PointInt):
+        room = self.labyrinth.get_square(square)
+        if room is not None and isinstance(room, Room):
+            return True
+        return False
 
     def _found(self, path: Path, end: PointInt):
-        room = self.labyrinth.get_room_of_square(path.current)
+        room = self.labyrinth.get_square(path.current)
         return room is not None and room.center == end
 
     def _heuristic(self, a: PointInt, b: PointInt):
@@ -241,37 +232,47 @@ class PathFinder:
 
     def _neighbors(self, square: PointInt) -> list[tuple[PointInt, Direction]]:
         squares: list[tuple[PointInt, Direction]] = []
-        if square[1] + 1 < len(self.labyrinth.room_squares):
+        if square[1] + 1 < len(self.labyrinth.squares):
             north = (square[0], square[1] + 1)
             squares.append((north, Direction.NORTH))
-        if square[1] > 0 and square[1] - 1 < len(self.labyrinth.room_squares):
+        if square[1] > 0 and square[1] - 1 < len(self.labyrinth.squares):
             south = (square[0], square[1] - 1)
             squares.append((south, Direction.SOUTH))
-        if square[0] > 0 and square[0] - 1 < len(self.labyrinth.room_squares[0]):
+        if square[0] > 0 and square[0] - 1 < len(self.labyrinth.squares[0]):
             west = (square[0] - 1, square[1])
             squares.append((west, Direction.WEST))
-        if square[0] + 1 < len(self.labyrinth.room_squares[0]):
+        if square[0] + 1 < len(self.labyrinth.squares[0]):
             east = (square[0] + 1, square[1])
             squares.append((east, Direction.EAST))
         return squares
 
 
 class RoomGenerator:
-    def __init__(self, num_rooms, min_dim, max_dim, gap, shape, seed):
-        self.num_rooms = num_rooms
-        self.min_dim = min_dim
-        self.max_dim = max_dim
-        self.gap = gap
-        self.shape = shape
-        self.seed = seed
+    def __init__(
+        self,
+        num_rooms: int,
+        min_dim: int,
+        max_dim: int,
+        gap: int,
+        shape: str,
+        seed: int,
+    ):
+        self.num_rooms: int = num_rooms
+        self.min_dim: int = min_dim
+        self.max_dim: int = max_dim
+        self.gap: int = gap
+        self.shape: str = shape
+        self.seed: int = seed
 
-        self.size = max_dim
-        self.max_tries = 1000
+        self.size: float = max_dim
+        self.max_tries: int = 10000
 
     def _generate_rooms(self):
         size = floor(self.size)
         rooms: list[Room] = []
-        room_squares: list[list[Room | None]] = [[None] * (size) for _ in range(size)]
+        room_squares: list[list[Rectangle | None]] = [
+            [None] * (size) for _ in range(size)
+        ]
         room_centers: list[PointInt] = []
         occupied: list[list[bool]] = [[False] * (size) for _ in range(size)]
         tries = 0
@@ -282,7 +283,9 @@ class RoomGenerator:
                 break
             corner = self._generate_point(size)
             width = random.randint(self.min_dim, self.max_dim)
-            height = random.randint(self.min_dim, self.max_dim)
+            height = random.randint(max(self.min_dim, width // 2 + 1), width)
+            if random.random() > 0.5:
+                width, height = height, width
             if self._invalid_room(corner, size, width, height):
                 tries += 1
                 continue
@@ -298,7 +301,7 @@ class RoomGenerator:
             room_centers.append(room.center)
         return rooms, room_squares, room_centers
 
-    def _generate_point(self, size):
+    def _generate_point(self, size: int) -> tuple[int, int]:
         max_pos = size - self.max_dim
         if self.shape == "circle":
             return point_in_circle(max_pos)
@@ -307,7 +310,13 @@ class RoomGenerator:
         raise ValueError("Bad shape")
 
     def _create_and_occupy_room(
-        self, occupied, room_squares, size, corner, width, height
+        self,
+        occupied: list[list[bool]],
+        room_squares: list[list[Rectangle | None]],
+        size: int,
+        corner: PointInt,
+        width: int,
+        height: int,
     ):
         room = Room(corner, width, height)
         for w in range(-self.gap, width + self.gap):
@@ -321,14 +330,18 @@ class RoomGenerator:
                     room_squares[corner[1] + h][corner[0] + w] = room
         return room
 
-    def _room_fits(self, occupied, corner, width, height):
+    def _room_fits(
+        self, occupied: list[list[bool]], corner: PointInt, width: int, height: int
+    ):
         for w in range(-self.gap, width):
             for h in range(-self.gap, height):
                 if occupied[corner[1] + h][corner[0] + w]:
                     return False
         return True
 
-    def _invalid_room(self, corner, size, width, height):
+    def _invalid_room(
+        self, corner: PointInt, size: int, width: int, height: int
+    ) -> bool:
         return (
             corner[0] + width + self.gap > size
             or corner[1] + height + self.gap > size
