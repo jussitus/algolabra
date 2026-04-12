@@ -1,14 +1,16 @@
 # Viikko 4
 
-(kesken)
+### Mitä olen tehnyt tällä viikolla?
 
-## Mitä tein?
-
-En ole pääsiäisloman jälkeen tehnyt paljoa. Lisäsin docstringeja puuttuviin funktioihin. Sain (hitaan ja monimutkaisen) Labyrinth-koodin lisäämään käytäväruutuja niin, että eri ruutujen yhteiset sivut on merkitty, joten ne voi jättää piirtämättä. 
+Lisäsin docstringeja puuttuviin funktioihin. Sain Labyrinth-koodin lisäämään käytäväruutuja niin, että eri ruutujen yhteiset sivut on merkitty, joten ne voi jättää piirtämättä. 
 
 ## Miten ohjelma on edistynyt?
 
 Perustoiminta pysynyt samana.
+
+### Mitä opin tällä viikolla / tänään?
+
+En oikein mitään.
 
 ## Mikä on tuottanut vaikeuksia?
 
