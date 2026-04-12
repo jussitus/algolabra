@@ -2,7 +2,7 @@
 
 ### Mitä olen tehnyt tällä viikolla?
 
-Lisäsin docstringeja puuttuviin funktioihin. Lisäsin pari yksikkötestiä. Sain Labyrinth-koodin lisäämään käytäväruutuja niin, että eri ruutujen yhteiset sivut on merkitty, joten ne voi jättää piirtämättä. Yksinkertaisin Labyrinth-koodia.
+Lisäsin docstringeja puuttuviin funktioihin. Lisäsin pari yksikkötestiä. Sain Labyrinth-koodin lisäämään käytäväruutuja niin, että eri ruutujen yhteiset sivut on merkitty, joten ne voi jättää piirtämättä. Yksinkertaistin Labyrinth-koodia.
 
 ## Miten ohjelma on edistynyt?
 
