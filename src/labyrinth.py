@@ -89,7 +89,7 @@ class Labyrinth:
             path: Path | None = path_finder.find_path(edge.org, edge.dest)  # pyright: ignore[reportArgumentType]
             current = path
             while current is not None:
-                if self.get_square(current.current) is None:
+                if self._get_square(current.current) is None:
                     corridor = Corridor(current.current)
                     self.squares[current.current[1]][current.current[0]] = corridor
                     self._link_corridor(corridor)
@@ -102,7 +102,7 @@ class Labyrinth:
         edges: list[Edge] = []
         for e in corridor.edges:
             re = self.edges.get((e.org, e.dest))
-            if re is not None:
+            if re is not None: # type: ignore
                 splice(e, re)
                 splice(e.sym, re.sym)
                 delete_quad_edge(e)
@@ -113,7 +113,7 @@ class Labyrinth:
                 edges.append(e)
         corridor.edges = edges
 
-    def get_square(self, square: PointInt):
+    def _get_square(self, square: PointInt):
         return self.squares[square[1]][square[0]]
 
     def _connect_rooms(self, room_centers: list[PointInt]) -> list[Edge]:
@@ -135,7 +135,17 @@ class Labyrinth:
             self.edges[(e.org, e.dest)] = e
             self.edges[(e.dest, e.org)] = e.sym
 
+    def _is_corridor(self, square: PointInt) -> bool:
+        corridor = self._get_square(square)
+        if corridor is not None and isinstance(corridor, Corridor):
+            return True
+        return False
 
+    def _is_room(self, square: PointInt):
+        room = self._get_square(square)
+        if room is not None and isinstance(room, Room):
+            return True
+        return False
 class Direction(Enum):
     NORTH = auto()
     EAST = auto()
@@ -198,7 +208,7 @@ class PathFinder:
         for neighbor, direction in neighbors:
             if self._closed(closed_list, neighbor):
                 continue
-            weight = 0.5 if self._is_corridor(neighbor) else 1
+            weight = 0.5 if self.labyrinth._is_corridor(neighbor) else 1
             c_direction = current_path.direction
             if c_direction is None or direction == c_direction:
                 penalty = 0
@@ -209,20 +219,10 @@ class PathFinder:
             path = Path(g + h, g, neighbor, direction, current_path)
             hq.heappush(open_list, path)
 
-    def _is_corridor(self, square: PointInt) -> bool:
-        corridor = self.labyrinth.get_square(square)
-        if corridor is not None and isinstance(corridor, Corridor):
-            return True
-        return False
 
-    def _is_room(self, square: PointInt):
-        room = self.labyrinth.get_square(square)
-        if room is not None and isinstance(room, Room):
-            return True
-        return False
 
     def _found(self, path: Path, end: PointInt):
-        room = self.labyrinth.get_square(path.current)
+        room = self.labyrinth._get_square(path.current)
         return room is not None and room.center == end
 
     def _heuristic(self, a: PointInt, b: PointInt):
