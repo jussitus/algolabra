@@ -1,16 +1,16 @@
 from math import isinf
 from sympy import Matrix
 import pytest
-from utils.point_generation import points_circular
+from utils.point_generation import points_random
 from planar_graph import PlanarGraph
 from condition import incircle
 
 N_SMALL = 100
 N_MEDIUM = 1000
 N_LARGE = 10000
-POINTS_SMALL = points_circular(N_SMALL, N_SMALL // 2, N_SMALL // 2, 42)
-POINTS_MEDIUM = points_circular(N_MEDIUM, N_MEDIUM // 2, N_MEDIUM // 2, 42)
-POINTS_LARGE = points_circular(N_LARGE, N_LARGE // 2, N_LARGE // 2, 42)
+POINTS_SMALL = points_random(N_SMALL, N_SMALL // 2, N_SMALL // 2, 42)
+POINTS_MEDIUM = points_random(N_MEDIUM, N_MEDIUM // 2, N_MEDIUM // 2, 42)
+POINTS_LARGE = points_random(N_LARGE, N_LARGE // 2, N_LARGE // 2, 42)
 
 
 @pytest.fixture

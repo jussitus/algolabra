@@ -1,3 +1,4 @@
+import logging
 from enum import Enum, auto
 import random
 from math import sqrt, floor
@@ -6,7 +7,7 @@ from typing import Self
 from planar_graph import PlanarGraph
 from edge import Edge, make_quad_edge, splice, delete_quad_edge
 from point import PointInt, Point
-
+from utils.log_utils import timer
 
 class Rectangle:
     def __init__(self, corner: PointInt, width: int = 1, height: int = 1):
@@ -68,7 +69,8 @@ class Labyrinth:
         self.rooms, self.squares, self.room_centers = self._generate_rooms()
         self.edges: dict[tuple[Point, Point], Edge] = self._index_room_edges()
         self.corridors: list[Corridor] = self._create_corridors()
-
+    
+    @timer(level=logging.DEBUG)
     def _generate_rooms(
         self,
     ) -> tuple[
@@ -359,12 +361,12 @@ class RoomGenerator:
 
 
 def point_in_circle(max_pos: int):
-    mid_x = max_pos // 2
-    mid_y = max_pos // 2
+    mid = max_pos // 2
+    mid2 = mid * mid
     while True:
         x = random.randint(0, max_pos)
         y = random.randint(0, max_pos)
-        if sqrt((x - mid_x) ** 2 + (y - mid_y) ** 2) <= max(mid_x, mid_y):
+        if (x - mid) + (y - mid) <= mid2:
             break
     return (x, y)
 

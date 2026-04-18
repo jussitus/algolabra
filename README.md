@@ -13,3 +13,5 @@
 [Viikko 3](docs/viikko3.md)
 
 [Viikko 4](docs/viikko4.md)
+
+[Viikko 5](docs/viikko5.md)
