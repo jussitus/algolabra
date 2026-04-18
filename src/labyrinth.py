@@ -366,7 +366,7 @@ def point_in_circle(max_pos: int):
     while True:
         x = random.randint(0, max_pos)
         y = random.randint(0, max_pos)
-        if (x - mid) + (y - mid) <= mid2:
+        if (x - mid) ** 2 + (y - mid) ** 2 <= mid2:
             break
     return (x, y)
 
