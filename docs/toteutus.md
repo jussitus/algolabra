@@ -2,7 +2,20 @@
 (kesken)
 ## Yleisrakenne
 
-Sovellus ...
+Sovellus luo labyrintteja ruudukossa, jossa huoneet on yhdistetty suorin käytävin.
+
+Aluksi generoidaan `n` määrä huoneita (suorakulmioita) ruudukkoon, niin että huoneet eivät ole päällekkäin. Generoitu huone testataan validiksi ja generointia jatketaan kunnes huoneita on `n` kappaletta. Jos generoitu huone ei ole validi maksimiyrityskertojen jälkeen, kasvatetaan ruudukon kokoa.
+
+(huoneiden Edge-olioista tähän)
+
+Yhteydet huoneiden välillä generoidaan laskemalle Delaunayn triangulaatio huoneiden keskipisteille tasossa. Triangulaatio on toteutettu Guibasin ja Stolfin hajota-ja-hallitse algoritmin avulla. Algoritmissa triangulaatio on konveksi, suunnattu tasoverkko. Sen perustietorakenne on quad-edge, joka koostuu neljästä kaaresta: sivu, sama sivu vastakkaiseen suuntaan (`sym`), tasoverkon duaalin sivu (`rot`, käännetty 90 astetta vasemmalle) ja se vastakkaiseen suuntaan (`tor`).
+
+Quad-edgen yksittäinen sivu neljästä on toteutettu Edge-luokkana. Sivuille on määritetty niiden lähtöpiste (`org`) ja seuraava sivu, jolla on sama lähtopiste (`onext`), sekä tietenkin linkit quad-edgen muihin sivuihin. Jotkin attribuutit, kuten sivun lähtöpiste `e.org`, ovat sivun attribuutteja, kun taas esim. sivun päätepiste saadaan `e.dest` on sama kuin päinvastaisen sivun lähtopiste `e.sym.org`.
+
+Sivuille on määritelty monia muita derivoituja attribuutteja. Esimerkiksi `e.lnext` on seuraava sivu, jolla on sama monikulmio vasemmalle puolella.
+
+Sivuja voidaan yhdistää topologisesti toisiinsa `splice` funktiolla, joka linkittää sivujen `onext` attribuutit toisiinsa. Sivujen välillë voidaan luoda uusi yhdistävä sivu `connect` funktiolla, ja sivu voidaan poistaa tasoverkosta `delete_quad_edge` funktiolla. On otettava huomioon, että pisteiden numeerisilla arvoilla ei ole vaikutusta sivujen topologisiin yhteyksiin, joten kaksi sivua, joilla on sama lähtöpiste, eivät ole automaattisesti yhteyksissä toisiinsa jos niitä ei linkitä `splice`:n avulla. 
+
 
 ## Lähteet
 

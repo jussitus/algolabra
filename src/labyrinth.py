@@ -9,8 +9,26 @@ from edge import Edge, make_quad_edge, splice, delete_quad_edge
 from point import PointInt, Point
 from utils.log_utils import timer
 
+
 class Rectangle:
+    """Class representing a rectangle in a grid.
+
+    Attributes:
+        `width`: Width of the rectangle.
+        'height': Height of the rectangle.
+        'corner': Coordinates of the top-left corner of the rectangle.
+        'edges': List of unit edges that make up the rectangle.
+        'corner_edge': Edge corresponding to `self.corner`.
+    """
+
     def __init__(self, corner: PointInt, width: int = 1, height: int = 1):
+        """Initializes the rectangle.
+
+        Args:
+            `corner`: coordinates of the top-left corner
+            'width': width of the rectangle
+            'height': height of the rectangle
+        """
         self.width: int = width
         self.height: int = height
         self.corner: PointInt = corner
@@ -20,6 +38,14 @@ class Rectangle:
         self.edges, self.corner_edge = self.create()
 
     def create(self) -> tuple[list[Edge], Edge]:
+        """Creates and connects the edges of the rectangle.
+
+        The edges are unit edges with length of 1.
+
+        Returns:
+            a list of rectangle unit edges
+
+        """
         edges: list[Edge] = []
         corner_edge = make_quad_edge(self.corner, (self.corner[0] + 1, self.corner[1]))
         edges.append(corner_edge)
@@ -33,6 +59,18 @@ class Rectangle:
     def add_side(
         self, edges: list[Edge], current_edge: Edge, length: int, displacement: PointInt
     ) -> Edge:
+        """Adds unit edges of one side of the rectangle.
+
+        Args:
+            `edges`: list of current edges
+            `current_edge`: last edge of the previous side
+            `length': length of the side
+            `displacement`: direction of the side
+
+        Returns:
+            the last edge of the side
+
+        """
         for _ in range(length):
             next_org = current_edge.dest
             next_dest = (
@@ -47,11 +85,15 @@ class Rectangle:
 
 
 class Room(Rectangle):
+    """Subclass of `Rectangle`, representing a room."""
+
     def __init__(self, *args):
         super().__init__(*args)
 
 
 class Corridor(Rectangle):
+    """Subclass of `Rectangle`, representing a corridor square."""
+
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -69,7 +111,7 @@ class Labyrinth:
         self.rooms, self.squares, self.room_centers = self._generate_rooms()
         self.edges: dict[tuple[Point, Point], Edge] = self._index_room_edges()
         self.corridors: list[Corridor] = self._create_corridors()
-    
+
     @timer(level=logging.DEBUG)
     def _generate_rooms(
         self,
@@ -104,7 +146,7 @@ class Labyrinth:
         edges: list[Edge] = []
         for e in corridor.edges:
             re = self.edges.get((e.org, e.dest))
-            if re is not None: # type: ignore
+            if re is not None:  # type: ignore
                 splice(e, re)
                 splice(e.sym, re.sym)
                 delete_quad_edge(e)
@@ -148,6 +190,8 @@ class Labyrinth:
         if room is not None and isinstance(room, Room):
             return True
         return False
+
+
 class Direction(Enum):
     NORTH = auto()
     EAST = auto()
@@ -220,8 +264,6 @@ class PathFinder:
             h = self._heuristic(neighbor, end)
             path = Path(g + h, g, neighbor, direction, current_path)
             hq.heappush(open_list, path)
-
-
 
     def _found(self, path: Path, end: PointInt):
         room = self.labyrinth._get_square(path.current)

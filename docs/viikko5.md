@@ -1,8 +1,8 @@
 # Viikko 5
-(kesken)
+
 ### Mitä olen tehnyt tällä viikolla?
 
-Tein vertaisarvioinnin. Kirjoitin loput yksikkötestit (paitsi `Labyrinth`-luokan).
+Tein vertaisarvioinnin. Kirjoitin loput yksikkötestit (paitsi `Labyrinth`-luokan). Kirjoitin docstringeja `Labyrinth`-luokalle. Kirjoitin toteutusdokumenttia.
 
 ## Miten ohjelma on edistynyt?
 
@@ -10,17 +10,16 @@ Pysynyt samana. Sanoisin ohjelman olevan aika lailla valmis, mutta `Labyrinth`-l
 
 ### Mitä opin tällä viikolla / tänään?
 
-Bowyerin-Watsonin algoritmista.
+Bowyerin-Watsonin algoritmista vertaisarviointia tehdessä.
 
 ## Mikä on tuottanut vaikeuksia?
 
-(kesken)
+Tekeminen tuntuu vähän päämäärättömältä, kun loput hommat koostuvat lähinnä tekstin kirjoittamisesti, eikä koodista.
 
 ## Mitä teen seuraavaksi?
 
-Kirjoitan testit ja docstringit `Labyrinth`-luokalle. 
-(kesken)
+Teen testit ja loput docstringit Labyrinth-luokalle. Kirjoitan testaus- ja toteutusdokumentit kuntoon.
 
 ## Aikaa meni
 
-n. 5 tuntia (sis. vertaisarvioinnin)
+n. 6 tuntia (sis. vertaisarvioinnin)

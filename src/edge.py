@@ -115,8 +115,7 @@ class Edge:
 
 
 def make_quad_edge(org: Point, dest: Point) -> Edge:
-    """
-    Creates and links the four edges in the quad-edge structure.
+    """Creates and links the four edges in the quad-edge structure.
 
     The edges are the principal edge, its symmetric edge, its rotated edge and the symmetric rotated edge. Dual flag is set for the rotated edges.
 
@@ -165,8 +164,7 @@ def make_quad_edge(org: Point, dest: Point) -> Edge:
 
 
 def splice(a: Edge, b: Edge):
-    """
-    Splices two edges such that [something here, onext ring...]
+    """Splices two edges such that [something here, onext ring...]
 
     Args:
         a: first edge
@@ -196,8 +194,7 @@ def connect(a: Edge, b: Edge) -> Edge:
 
 
 def delete_quad_edge(e: Edge):
-    """
-    Disconnects an edge from the graph.
+    """Disconnects an edge from the graph.
 
     Only severs the connections to other edges. Does not delete the edge from memory.
 
@@ -209,8 +206,7 @@ def delete_quad_edge(e: Edge):
 
 
 def triangle_ccw(e: Edge) -> tuple[Edge, Edge, Edge]:
-    """
-    Gives the counterclockwise triangle the edge is part of.
+    """Gives the counterclockwise triangle the edge is part of.
 
     Args:
         e: edge
@@ -222,8 +218,7 @@ def triangle_ccw(e: Edge) -> tuple[Edge, Edge, Edge]:
 
 
 def triangle_cw(e: Edge) -> tuple[Edge, Edge, Edge]:
-    """
-    Gives the clockwise triangle the edge is part of.
+    """Gives the clockwise triangle the edge is part of.
 
     Args:
         e: edge
