@@ -1,7 +1,16 @@
 from math import sqrt
 
 import pytest
-from edge import Edge, connect, delete_quad_edge, make_quad_edge, splice, triangle_ccw, triangle_cw, circumcircle
+from edge import (
+    Edge,
+    connect,
+    delete_quad_edge,
+    make_quad_edge,
+    splice,
+    triangle_ccw,
+    triangle_cw,
+    circumcircle,
+)
 
 
 def test_constructor_edge():
@@ -78,28 +87,30 @@ def test_delete_quad_edge():
 def test_triangle_ccw():
     a = make_quad_edge((0, 0), (1, 0))
     b = make_quad_edge((0, 0), (1, 1))
-    splice(a,b)
-    c = connect(a,b.sym)
+    splice(a, b)
+    c = connect(a, b.sym)
     triangle = triangle_ccw(a)
     assert a == triangle[0]
     assert c == triangle[1]
     assert b.sym == triangle[2]
 
+
 def test_triangle_cw():
     a = make_quad_edge((0, 0), (1, 0))
     b = make_quad_edge((0, 0), (1, 1))
-    splice(a,b)
-    c = connect(a,b.sym)
+    splice(a, b)
+    c = connect(a, b.sym)
     triangle = triangle_cw(a.sym)
     assert a.sym == triangle[0]
     assert c.sym == triangle[1]
     assert b == triangle[2]
 
+
 def test_circumcircle():
     a = make_quad_edge((0, 0), (1, 0))
     b = make_quad_edge((0, 0), (1, 1))
-    splice(a,b)
-    c = connect(a,b.sym)
-    (x,y), r = circumcircle(a)
-    assert (x,y) == (0.5, 0.5)
+    splice(a, b)
+    c = connect(a, b.sym)
+    (x, y), r = circumcircle(a)
+    assert (x, y) == (0.5, 0.5)
     assert r == sqrt(2) / 2
