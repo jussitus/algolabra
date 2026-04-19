@@ -7,7 +7,15 @@ Testit voi ajaa komennolla `poetry run pytest`.
 ## Yksikkötestaus
 
 Yksikkötestien testikattavuus:
-<img src="testaus.png">
+```
+Name                  Stmts   Miss Branch BrPart  Cover
+-------------------------------------------------------
+src/condition.py         12      0      0      0   100%
+src/edge.py             102      8      6      2    89%
+src/planar_graph.py     206     30     64      8    86%
+-------------------------------------------------------
+TOTAL                   320     38     70     10    87%
+```
 
 Yksikkötestit testaavat Edge- ja PlanarGraph-luokkien konstruktoreita ja metodeja hyvin pienillä syötteillä.
 

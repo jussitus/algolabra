@@ -16,6 +16,8 @@ Bowyerin-Watsonin algoritmista vertaisarviointia tehdessä.
 
 Tekeminen tuntuu vähän päämäärättömältä, kun loput hommat koostuvat lähinnä tekstin kirjoittamisesti, eikä koodista.
 
+Yksikkötestauksessa pitäisi varmaan injektoida `condition`-riippuvuudet, ainakin jotta testikattavuus olisi suorilta oikein, mutta saman voi saada aikaan varmaan argumentilla coveragelle.
+
 ## Mitä teen seuraavaksi?
 
 Teen testit ja loput docstringit Labyrinth-luokalle. Kirjoitan testaus- ja toteutusdokumentit kuntoon.
