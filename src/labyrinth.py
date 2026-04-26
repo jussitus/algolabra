@@ -99,12 +99,41 @@ class Corridor(Rectangle):
 
 
 class Labyrinth:
-    def __init__(self, num_rooms: int, seed: int, max_dim: int, min_dim: int, gap: int):
+    """"
+    Class representing a labyrinth.
+
+    Labyrinth is made up of rooms and corridors between rooms. The connections between rooms are calculated by computing the Delaunay triangulation of the room centers on a plane and then taking the edges of the minimum spanning tree. 
+    
+    Attributes:
+        `num_rooms`: number of rooms in the labyrinth
+        `seed`: random seed used to generate rooms
+        `max_dim`: maximum dimension of a room
+        `min_dim`: minimum dimension of a room
+        `gap`: minimum amount of squares between rooms
+        `shape`: shape of the labyrinth (square or circular)
+        `rooms`: list of rooms
+        `corridors`: list of corridor squares
+        `squares`: index of squares in the labyrinth
+        `room_centers`: list of room centers
+        `edges`: index of edges in the labyrinth
+    """
+    def __init__(self, num_rooms: int, seed: int, max_dim: int, min_dim: int, gap: int, shape: str):
+        """Instantiates the labyrinth.
+        
+        Args:
+            `num_rooms`: number of rooms in the labyrinth
+            `seed`: random seed used to generate rooms
+            `max_dim`: maximum dimension of a room
+            `min_dim`: minimum dimension of a room
+            `gap`: minimum amount of squares between rooms
+            `shape`: shape of the labyrinth (square or circular)
+        """
         self.num_rooms: int = num_rooms
         self.seed: int = seed
-        self.max_dim: int = max_dim
-        self.min_dim: int = min_dim
+        self.max_dim: int = max(max_dim, 1)
+        self.min_dim: int = min(min_dim, self.max_dim)
         self.gap: int = gap
+        self.shape: str = shape
         self.rooms: list[Room]
         self.squares: list[list[Rectangle | None]]
         self.room_centers: list[PointInt]
@@ -121,11 +150,19 @@ class Labyrinth:
         list[PointInt],
     ]:
         room_generator = RoomGenerator(
-            self.num_rooms, self.min_dim, self.max_dim, self.gap, "circle", self.seed
+            self.num_rooms, self.min_dim, self.max_dim, self.gap, self.shape, self.seed
         )
         return room_generator.run()
 
-    def _create_corridors(self):
+    def _create_corridors(self) -> list[Corridor]:
+        """
+        Creates corridors.
+
+        First connections between rooms are obtained from the minimum spanning tree. Then a path in the grid is found for each connection using A*.
+
+        Returns:
+            a list of `Corridor` squares
+        """
         connections = self._connect_rooms(self.room_centers)
         corridors: list[Corridor] = []
         path_finder = PathFinder(self)
@@ -143,6 +180,10 @@ class Labyrinth:
         return corridors
 
     def _link_corridor(self, corridor: Corridor):
+        """Links edges of a corridor square with existing edges.
+
+        Existing edges are preferred and any corridor edge sharing space is replaced with the existing one, after linking.
+        """
         edges: list[Edge] = []
         for e in corridor.edges:
             re = self.edges.get((e.org, e.dest))
@@ -157,16 +198,26 @@ class Labyrinth:
                 edges.append(e)
         corridor.edges = edges
 
-    def _get_square(self, square: PointInt):
+    def _get_square(self, square: PointInt) -> Rectangle | None:
+        """Returns the square of the coordinate."""
         return self.squares[square[1]][square[0]]
 
     def _connect_rooms(self, room_centers: list[PointInt]) -> list[Edge]:
+        """Computes the Delaunay triangulation of the room center points and the minimum spanning tree of the triangulation.
+        
+        Returns:
+            the minimum spanning tree of the triangulation, representing connections in the labyrinth"""
         d = PlanarGraph(room_centers)
         d.run()
         connections: list[Edge] = d.mst_delaunay
         return connections
 
     def _index_room_edges(self) -> dict[tuple[Point, Point], Edge]:
+        """Indexes the edges of all rooms, for lookup of existing edges.
+        
+        Returns:
+            a dict of coordinate pairs and edges
+        """
         index: dict[tuple[Point, Point], Edge] = {}
         for room in self.rooms:
             for e in room.edges:
@@ -175,6 +226,7 @@ class Labyrinth:
         return index
 
     def _index_corridor_edges(self, corridor: Corridor):
+        """Indexes the edges of a single corridor square, for lookup of existing edges."""
         for e in corridor.edges:
             self.edges[(e.org, e.dest)] = e
             self.edges[(e.dest, e.org)] = e.sym
@@ -200,6 +252,17 @@ class Direction(Enum):
 
 
 class Path:
+    """Class representing a path in the labyrinth.
+
+    Implemented as a linked list.
+
+    Attributes:
+        `f_length`: approximate total length of the path, current length + heuristic
+        `g_length`: current length of the path
+        `current`: current coordinate of the square
+        `direction`: direction of current square relative to the previous square
+        `path`: previous square
+    """
     def __init__(
         self,
         f_length: float,
@@ -219,10 +282,22 @@ class Path:
 
 
 class PathFinder:
+    """Class implementing A* pathfinding between two labyrinth squares.
+    """
     def __init__(self, labyrinth: Labyrinth):
         self.labyrinth: Labyrinth = labyrinth
 
     def find_path(self, start: PointInt, end: PointInt) -> Path | None:
+        """"
+        A* search.
+
+        Args:
+            `start`: coordinates of start square
+            `end`: coordinates of end square
+        
+        Returns:
+            shortest path connecting the two squares
+        """
         first = Path(self._heuristic(start, end), 0, start, None, None)
         size = len(self.labyrinth.squares)
         closed_list = [[False] * size for _ in range(size)]
@@ -247,6 +322,10 @@ class PathFinder:
         current_path: Path,
         end: PointInt,
     ):
+        """Expands a node.
+        
+        Existing corridor squares are weighed less.
+        """
         if self._closed(closed_list, current_path.current):
             return
         self._close(closed_list, current_path.current)
@@ -270,11 +349,13 @@ class PathFinder:
         return room is not None and room.center == end
 
     def _heuristic(self, a: PointInt, b: PointInt):
+        """Returns the Manhattan distance between two squares."""
         # return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
         return 0.5 * (abs(a[0] - b[0]) + abs(a[1] - b[1]))
         # return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
     def _neighbors(self, square: PointInt) -> list[tuple[PointInt, Direction]]:
+        """Returns the four neighboring squares."""
         squares: list[tuple[PointInt, Direction]] = []
         if square[1] + 1 < len(self.labyrinth.squares):
             north = (square[0], square[1] + 1)

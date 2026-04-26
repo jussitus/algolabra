@@ -29,6 +29,7 @@ def parse_arguments():
         "-md", "--min-dim", default=2, type=int, help="minimum width/height of rooms"
     )
     parser.add_argument("-g", "--gap", default=1, type=int, help="gap between rooms")
+    parser.add_argument("-sh", "--shape", default="circle", type=str, choices=["circle", "square"], help="shape of the labyrinth")
     return parser.parse_args()
 
 
@@ -38,7 +39,8 @@ def main(args):
     max_dim = args.max_dim
     min_dim = args.min_dim
     gap = args.gap
-    lab = Labyrinth(num_rooms, seed, max_dim, min_dim, gap)
+    shape = args.shape
+    lab = Labyrinth(num_rooms, seed, max_dim, min_dim, gap, shape)
 
     walls = []
     shared = []

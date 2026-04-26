@@ -10,7 +10,7 @@ Aluksi generoidaan `n` määrä huoneita (suorakulmioita) ruudukkoon, niin että
 
 Yhteydet huoneiden välillä generoidaan laskemalle Delaunayn triangulaatio huoneiden keskipisteille tasossa. Triangulaatio on toteutettu Guibasin ja Stolfin hajota-ja-hallitse algoritmin avulla. Algoritmissa triangulaatio on konveksi, suunnattu tasoverkko. Sen perustietorakenne on quad-edge, joka koostuu neljästä kaaresta: sivu, sama sivu vastakkaiseen suuntaan (`sym`), tasoverkon duaalin sivu (`rot`, käännetty 90 astetta vasemmalle) ja se vastakkaiseen suuntaan (`tor`).
 
-Quad-edgen yksittäinen sivu neljästä on toteutettu Edge-luokkana. Sivuille on määritetty niiden lähtöpiste (`org`) ja seuraava sivu, jolla on sama lähtopiste (`onext`), sekä tietenkin linkit quad-edgen muihin sivuihin. Jotkin attribuutit, kuten sivun lähtöpiste `e.org`, ovat sivun attribuutteja, kun taas esim. sivun päätepiste saadaan `e.dest` on sama kuin päinvastaisen sivun lähtopiste `e.sym.org`.
+Quad-edgen yksittäinen sivu neljästä on toteutettu Edge-luokkana. Sivuille on määritelty niiden lähtöpiste (`org`) ja seuraava sivu, jolla on sama lähtopiste (`onext`), sekä tietenkin linkit quad-edgen muihin sivuihin. Jotkin attribuutit, kuten sivun lähtöpiste `e.org`, ovat sivun attribuutteja, kun taas esim. sivun päätepiste saadaan `e.dest` on sama kuin päinvastaisen sivun lähtopiste `e.sym.org`.
 
 Sivuille on määritelty monia muita derivoituja attribuutteja. Esimerkiksi `e.lnext` on seuraava sivu, jolla on sama monikulmio vasemmalle puolella.
 

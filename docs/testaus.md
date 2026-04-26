@@ -4,6 +4,8 @@ Testauksessa käytetään Pytestiä.
 
 Testit voi ajaa komennolla `poetry run pytest`.
 
+Yksikkötestien testikattavuuden voi generoida juurihakemiston `test.sh` skriptilla.
+
 ## Yksikkötestaus
 
 Yksikkötestien testikattavuus:
