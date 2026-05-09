@@ -103,7 +103,6 @@ def test_all_non_hull_voronoi_edges_have_finite_geometry(graph_large):
     hull = set(graph.hull)
     for e in graph.edges:
         if e.dual and (e.rot not in hull and e.rot.sym not in hull):
-            # split test?
             assert e.radius is not None
             assert e.radius > 0
             assert not isinf(e.org[0])

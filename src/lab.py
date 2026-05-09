@@ -30,6 +30,7 @@ def parse_arguments():
     )
     parser.add_argument("-g", "--gap", default=1, type=int, help="gap between rooms")
     parser.add_argument("-sh", "--shape", default="circle", type=str, choices=["circle", "square"], help="shape of the labyrinth")
+    parser.add_argument("-c", "--cycle-score", default=0.2, type=float, help="percentage of cycles added to the labyrinth, 0-1.0")
     return parser.parse_args()
 
 
@@ -40,7 +41,8 @@ def main(args):
     min_dim = args.min_dim
     gap = args.gap
     shape = args.shape
-    lab = Labyrinth(num_rooms, seed, max_dim, min_dim, gap, shape)
+    cycle_score = args.cycle_score
+    lab = Labyrinth(num_rooms, seed, max_dim, min_dim, gap, shape, cycle_score)
 
     walls = []
     shared = []

@@ -43,7 +43,7 @@ class Rectangle:
         The edges are unit edges with length of 1.
 
         Returns:
-            a list of rectangle unit edges
+            a tuple of list of rectangle unit edges and the top left-to-right edge
 
         """
         edges: list[Edge] = []
@@ -117,7 +117,7 @@ class Labyrinth:
         `room_centers`: list of room centers
         `edges`: index of edges in the labyrinth
     """
-    def __init__(self, num_rooms: int, seed: int, max_dim: int, min_dim: int, gap: int, shape: str):
+    def __init__(self, num_rooms: int, seed: int, max_dim: int, min_dim: int, gap: int, shape: str, cycle_score: float):
         """Instantiates the labyrinth.
         
         Args:
@@ -127,6 +127,7 @@ class Labyrinth:
             `min_dim`: minimum dimension of a room
             `gap`: minimum amount of squares between rooms
             `shape`: shape of the labyrinth (square or circular)
+            `cycle_score`: ratio of cycles added to the MST from the triangulation
         """
         self.num_rooms: int = num_rooms
         self.seed: int = seed
@@ -134,6 +135,7 @@ class Labyrinth:
         self.min_dim: int = min(min_dim, self.max_dim)
         self.gap: int = gap
         self.shape: str = shape
+        self.cycle_score = cycle_score
         self.rooms: list[Room]
         self.squares: list[list[Rectangle | None]]
         self.room_centers: list[PointInt]
@@ -210,7 +212,10 @@ class Labyrinth:
         d = PlanarGraph(room_centers)
         d.run()
         connections: list[Edge] = d.mst_delaunay
-        return connections
+        for edge in d.delaunay:
+            if random.random() < self.cycle_score:
+                connections.append(edge)
+        return list(set(connections))
 
     def _index_room_edges(self) -> dict[tuple[Point, Point], Edge]:
         """Indexes the edges of all rooms, for lookup of existing edges.
@@ -312,7 +317,7 @@ class PathFinder:
     def _close(self, closed_list: list[list[bool]], square: PointInt):
         closed_list[square[1]][square[0]] = True
 
-    def _closed(self, closed_list: list[list[bool]], square: PointInt):
+    def _closed(self, closed_list: list[list[bool]], square: PointInt) -> bool:
         return closed_list[square[1]][square[0]]
 
     def _expand(
@@ -344,15 +349,13 @@ class PathFinder:
             path = Path(g + h, g, neighbor, direction, current_path)
             hq.heappush(open_list, path)
 
-    def _found(self, path: Path, end: PointInt):
+    def _found(self, path: Path, end: PointInt) -> bool:
         room = self.labyrinth._get_square(path.current)
         return room is not None and room.center == end
 
-    def _heuristic(self, a: PointInt, b: PointInt):
-        """Returns the Manhattan distance between two squares."""
-        # return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+    def _heuristic(self, a: PointInt, b: PointInt) -> float:
+        """Returns the Manhattan distance between two squares, weighed by the reduced cost of traversing corridors."""
         return 0.5 * (abs(a[0] - b[0]) + abs(a[1] - b[1]))
-        # return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
     def _neighbors(self, square: PointInt) -> list[tuple[PointInt, Direction]]:
         """Returns the four neighboring squares."""
@@ -373,6 +376,18 @@ class PathFinder:
 
 
 class RoomGenerator:
+    """Class that randomly generates rooms in a grid.
+
+    Attributes:
+        `num_rooms`: number of rooms
+        `min_dim`: minimum shortest dimension in units
+        `max_dim`: maximum longest dimension in units
+        `gap`: minimum gap between rooms
+        `shape`: general shape of room placement, "square" or "circle"
+        `seed`: random seed
+        `size`: size of the grid, increases if rejection sampling fails for `max_tries`
+        `max_tries`: max tries to fit one room in the grid
+    """
     def __init__(
         self,
         num_rooms: int,
@@ -393,6 +408,7 @@ class RoomGenerator:
         self.max_tries: int = 10000
 
     def _generate_rooms(self):
+        """Generates rooms using rejection sampling."""
         size = floor(self.size)
         rooms: list[Room] = []
         room_squares: list[list[Rectangle | None]] = [
@@ -443,6 +459,7 @@ class RoomGenerator:
         width: int,
         height: int,
     ):
+        """Creates a room and marks the squares as occupied."""
         room = Room(corner, width, height)
         for w in range(-self.gap, width + self.gap):
             if corner[0] + w >= size:
@@ -458,6 +475,7 @@ class RoomGenerator:
     def _room_fits(
         self, occupied: list[list[bool]], corner: PointInt, width: int, height: int
     ):
+        """Checks if the squares of the potential room are already occupied."""
         for w in range(-self.gap, width):
             for h in range(-self.gap, height):
                 if occupied[corner[1] + h][corner[0] + w]:
@@ -467,6 +485,7 @@ class RoomGenerator:
     def _invalid_room(
         self, corner: PointInt, size: int, width: int, height: int
     ) -> bool:
+        """Checks if the potential room is within grid bounds."""
         return (
             corner[0] + width + self.gap > size
             or corner[1] + height + self.gap > size
@@ -475,11 +494,12 @@ class RoomGenerator:
         )
 
     def run(self):
+        """Runs the room generation until the required amount of rooms have been generated. If the generation short circuits due to exceeding maximum tries for room placement, it increases the grid size."""
         while True:
             rooms, room_squares, room_centers = self._generate_rooms()
             if len(rooms) == self.num_rooms:
                 break
-            self.size *= 1.1
+            self.size *= 1.05
         return rooms, room_squares, room_centers
 
 
