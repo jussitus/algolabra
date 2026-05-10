@@ -3,7 +3,13 @@
 ## Dokumentaatio
 [Määrittely](docs/maarittely.md)
 
-[Käyttöohje (kesken)](docs/ohje.md)
+[Toteutus](docs/toteutus.md)
+
+[Testaus](docs/testaus.md)
+
+[Käyttöohje](docs/ohje.md)
+
+
 
 ## Viikkoraportit
 [Viikko 1](docs/viikko1.md)
