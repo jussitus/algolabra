@@ -56,6 +56,11 @@ Syötteillä `n = 1000, 10000, 100000, 1000000` ja terminaalin tulosteesta voida
 - Primin algoritmi: O(n log n) 
 
 En testannut muita, kuten huoneiden luontia tai A\*.
+
+## Puutteita
+
+Etenkin `labyrinth`-moduulin koodi ei ole kovin selkeää ja esim. osa funktioista muuttaa globaalia tilaa ja osa palauttaa tuloksen. Lisäksi kyseistä moduulia ei ole testattu melkein ollenkaan.
+
 ## Lähteet
 
 Delaunayn triangulaation algoritmi ja tietorakenteet perustuvat melkein täysin tähän artikkeliin:
