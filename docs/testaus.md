@@ -1,5 +1,5 @@
 # Testaus
-(kesken)
+
 Testauksessa käytetään Pytestiä. 
 
 Testit voi ajaa komennolla `poetry run pytest`.
@@ -31,4 +31,4 @@ Yksikkötestit testaavat Edge- ja PlanarGraph-luokkien konstruktoreita ja metode
 
 Yksikkötestien lisäksi testataan Delaunay-triangulaatioon liittyviä geometrisia invariantteja, joista tärkein on, että jokaisen triangulaation kolmion määrittämän ympyrän kehän sisäpuolella ei ole muita pisteitä. Lisäksi kaikkien sivujen määrä voidaan laskea uloimmaisten sivujen lukumäärästä. Pienillä syötteillä testit toteutetaan `sympy`-kirjaston avulla, suuremilla syötteillä ohjelman oman `incircle`-testin avulla.
 
-Labyrintista testataan, että syvyyshaku löytää kaikki huoneet ja että seuraamalla yhtä seinää päästään takaisin alkuun.
+`labyrinth`-moduulista testataan, että leveyshaku löytää kaikki huoneet ja että seuraamalla yhtä seinää päästään takaisin alkuun.

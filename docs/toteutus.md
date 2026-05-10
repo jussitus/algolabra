@@ -50,8 +50,12 @@ Lisäksi triangulaation pienin virittävä alipuu lasketaan Primin algoritmilla.
 
 ## Aikavaativuus
 
-kesken
+Syötteillä `n = 1000, 10000, 100000, 1000000` ja terminaalin tulosteesta voidaan empiirisesti todeta seuraavat aikavaativuudet:
+- Delaunayn triangulaatio: O(n log n)
+- Voronoin diagrammi (ympyröiden keskipisteet ja säteet): O(n)
+- Primin algoritmi: O(n log n) 
 
+En testannut muita, kuten huoneiden luontia tai A\*.
 ## Lähteet
 
 Delaunayn triangulaation algoritmi ja tietorakenteet perustuvat melkein täysin tähän artikkeliin:
