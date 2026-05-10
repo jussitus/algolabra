@@ -1,30 +1,28 @@
-from collections import deque
+from collections import deque, Counter
 from edge import Edge
 from graphics import EdgeDrawer
 from labyrinth import Labyrinth
+
 def dfs(start):
     q = deque()
     q.append(start)
-    closed = {}
-    res = []
+    res = set()
     while len(q) > 0:
         p = q.popleft()
-        res.append(p)
         ring = [p]
         current = p.onext
         while current is not p:
             ring.append(current)
             current = current.onext
-        print(len(ring))
         for e in ring:
-            if closed.get(e.sym.org) is not None:
+            if e.sym in res:
                 continue
             q.append(e.sym)
-            closed[e.sym.org] = True
-    return res
+            res.add(e.sym)
+    return list(res)
 
-def test_same_edges():
-    lab = Labyrinth(2, 1, 1, 1, 1, "square", 0)
+def test_search_using_edge_connections_finds_everything():
+    lab = Labyrinth(20, 1, 3, 5, 1, "square", 0)
     start = lab.rooms[0].corner_edge
     edges_dfs = dfs(start)
     edges_lab = []
@@ -32,8 +30,7 @@ def test_same_edges():
         for edge in rectangle.edges:
             edges_lab.append(edge)
             edges_lab.append(edge.sym)
-    edges = [(e.org,e.dest) for e in edges_dfs]
-    edge_drawer = EdgeDrawer()
-    edge_drawer.add_edges(edges, colors="black", linewidths=1.5)
-    edge_drawer.show()
+    edges_lab = list(set(edges_lab))
+    assert Counter(edges_dfs) == Counter(edges_lab)
+
 

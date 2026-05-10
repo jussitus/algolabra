@@ -4,7 +4,7 @@ Testauksessa käytetään Pytestiä.
 
 Testit voi ajaa komennolla `poetry run pytest`.
 
-Yksikkötestien testikattavuuden voi generoida juurihakemiston `test.sh` skriptilla.
+Yksikkötestien testikattavuuden voi generoida juurihakemiston `unit_test_coverage.sh` skriptilla.
 
 ## Yksikkötestaus
 
