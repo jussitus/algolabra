@@ -64,7 +64,7 @@ Delaunayn triangulaation algoritmi ja tietorakenteet perustuvat melkein täysin 
 
 Inspiraatiota antoivat nämä blogipostaukset:
 - [Procedurally Generated Dungeons](https://vazgriz.com/119/procedurally-generated-dungeons/)
-- [Visualizing Delaunay Triangulation](https://ianthehenry.com/posts/delaunay/) (Toteuttaa algoritmin toisen, iteratiivisen algoritmi)
+- [Visualizing Delaunay Triangulation](https://ianthehenry.com/posts/delaunay/) (Toteuttaa artikkelin toisen, iteratiivisen algoritmin)
 
 Eniten käytetyt Wikipedia-artikkelit:
 - [Prim's algorithm](https://en.wikipedia.org/wiki/Prim%27s_algorithm)
