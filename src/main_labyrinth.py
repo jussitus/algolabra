@@ -8,7 +8,7 @@ from utils.log_utils import logger
 logger.setLevel(logging.DEBUG)
 
 from argparse import ArgumentParser
-from graphics import EdgeDrawer
+from graphics import Drawer
 from labyrinth import Labyrinth, Room
 
 
@@ -54,10 +54,10 @@ def main(args):
             else:
                 shared.append([edge.org, edge.dest])
 
-    edge_drawer = EdgeDrawer()
-    edge_drawer.add_edges(walls, colors="black", linewidths=1.5)
-    edge_drawer.add_edges(shared, colors="black", linewidths=1.5, alpha=0.2)
-    edge_drawer.show()
+    drawer = Drawer()
+    drawer.add_edges(walls, colors="black", linewidths=1.5)
+    drawer.add_edges(shared, colors="black", linewidths=1.5, alpha=0.2)
+    drawer.show()
 
 
 if __name__ == "__main__":

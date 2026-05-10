@@ -1,6 +1,6 @@
 from collections import deque, Counter
 from edge import Edge
-from graphics import EdgeDrawer
+from graphics import Drawer
 from labyrinth import Labyrinth
 
 def dfs(start):
@@ -34,3 +34,17 @@ def test_search_using_edge_connections_finds_everything():
     assert Counter(edges_dfs) == Counter(edges_lab)
 
 
+def test_hand_on_wall_gets_back_to_start():
+    lab = Labyrinth(2, 1, 3, 5, 1, "square", 0.5)
+    start = lab.rooms[0].corner_edge
+    edges_dfs = dfs(start)
+    k = len(edges_dfs)
+    found = False
+    current = start.rnext
+    for i in range(k):
+        if current is start:
+            found = True
+            break
+        current = current.rnext
+        print(i)
+    assert found

@@ -30,7 +30,7 @@ Sivuille on määritelty monia muita derivoituja attribuutteja. Esimerkiksi `e.l
 
 Sivuja voidaan yhdistää topologisesti toisiinsa `splice` funktiolla, joka linkittää sivujen `onext` attribuutit toisiinsa. Sivujen välille voidaan luoda uusi yhdistävä sivu `connect` funktiolla, ja sivu voidaan poistaa tasoverkosta `delete_quad_edge` funktiolla. On otettava huomioon, että pisteiden numeerisilla arvoilla ei ole vaikutusta sivujen topologisiin yhteyksiin, joten kaksi sivua, joilla on sama lähtöpiste, eivät ole automaattisesti yhteyksissä toisiinsa jos niitä ei linkitä `splice`:n avulla.
 
-Lisäksi sivuilla on lisäattribuutteja kuten `origin`, jotka liittyvät Delaunayn triangulaation duaaliin, Voronoin diagrammiin. Voronoi-jutut eivät kuulu projektin määrittelyyn.
+Lisäksi sivuilla on lisäattribuutteja kuten `radius`, jotka liittyvät Delaunayn triangulaation duaaliin, Voronoin diagrammiin.
 
 Itse algoritmi ottaa syötteekseen pistejoukon. Funktio `_delaunay` jakaa joukon rekursiivisesti x-koordinaatin mukaan aina kahtia, kunnes päästään alkutapauksiin, jossa joukossa on 2 tai 3 pistettä.
 

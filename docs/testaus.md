@@ -12,11 +12,11 @@ Yksikkötestien testikattavuus:
 ```
 Name                  Stmts   Miss Branch BrPart  Cover
 -------------------------------------------------------
-src/condition.py         12      0      0      0   100%
+src/condition.py         13      0      0      0   100%
 src/edge.py             102      8      6      2    89%
 src/planar_graph.py     206     30     64      8    86%
 -------------------------------------------------------
-TOTAL                   320     38     70     10    87%
+TOTAL                   321     38     70     10    87%
 ```
 
 Yksikkötestit testaavat Edge- ja PlanarGraph-luokkien konstruktoreita ja metodeja hyvin pienillä syötteillä.
@@ -30,3 +30,5 @@ Yksikkötestit testaavat Edge- ja PlanarGraph-luokkien konstruktoreita ja metode
 ## Invarianttitestaus
 
 Yksikkötestien lisäksi testataan Delaunay-triangulaatioon liittyviä geometrisia invariantteja, joista tärkein on, että jokaisen triangulaation kolmion määrittämän ympyrän kehän sisäpuolella ei ole muita pisteitä. Lisäksi kaikkien sivujen määrä voidaan laskea uloimmaisten sivujen lukumäärästä. Pienillä syötteillä testit toteutetaan `sympy`-kirjaston avulla, suuremilla syötteillä ohjelman oman `incircle`-testin avulla.
+
+Labyrintista testataan, että syvyyshaku löytää kaikki huoneet ja että seuraamalla yhtä seinää päästään takaisin alkuun.
