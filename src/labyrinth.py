@@ -99,11 +99,10 @@ class Corridor(Rectangle):
 
 
 class Labyrinth:
-    """"
-    Class representing a labyrinth.
+    """Class representing a labyrinth.
 
-    Labyrinth is made up of rooms and corridors between rooms. The connections between rooms are calculated by computing the Delaunay triangulation of the room centers on a plane and then taking the edges of the minimum spanning tree. 
-    
+    Labyrinth is made up of rooms and corridors between rooms. The connections between rooms are calculated by computing the Delaunay triangulation of the room centers on a plane and then taking the edges of the minimum spanning tree.
+
     Attributes:
         `num_rooms`: number of rooms in the labyrinth
         `seed`: random seed used to generate rooms
@@ -117,9 +116,19 @@ class Labyrinth:
         `room_centers`: list of room centers
         `edges`: index of edges in the labyrinth
     """
-    def __init__(self, num_rooms: int, seed: int, max_dim: int, min_dim: int, gap: int, shape: str, cycle_score: float):
+
+    def __init__(
+        self,
+        num_rooms: int,
+        seed: int,
+        max_dim: int,
+        min_dim: int,
+        gap: int,
+        shape: str,
+        cycle_score: float,
+    ):
         """Instantiates the labyrinth.
-        
+
         Args:
             `num_rooms`: number of rooms in the labyrinth
             `seed`: random seed used to generate rooms
@@ -135,7 +144,7 @@ class Labyrinth:
         self.min_dim: int = min(min_dim, self.max_dim)
         self.gap: int = gap
         self.shape: str = shape
-        self.cycle_score = cycle_score
+        self.cycle_score: float = cycle_score
         self.rooms: list[Room]
         self.squares: list[list[Rectangle | None]]
         self.room_centers: list[PointInt]
@@ -157,8 +166,7 @@ class Labyrinth:
         return room_generator.run()
 
     def _create_corridors(self) -> list[Corridor]:
-        """
-        Creates corridors.
+        """Creates corridors.
 
         First connections between rooms are obtained from the minimum spanning tree. Then a path in the grid is found for each connection using A*.
 
@@ -206,9 +214,10 @@ class Labyrinth:
 
     def _connect_rooms(self, room_centers: list[PointInt]) -> list[Edge]:
         """Computes the Delaunay triangulation of the room center points and the minimum spanning tree of the triangulation.
-        
+
         Returns:
-            the minimum spanning tree of the triangulation, representing connections in the labyrinth"""
+            the minimum spanning tree of the triangulation, representing connections in the labyrinth
+        """
         d = PlanarGraph(room_centers)
         d.run()
         connections: list[Edge] = d.mst_delaunay
@@ -219,7 +228,7 @@ class Labyrinth:
 
     def _index_room_edges(self) -> dict[tuple[Point, Point], Edge]:
         """Indexes the edges of all rooms, for lookup of existing edges.
-        
+
         Returns:
             a dict of coordinate pairs and edges
         """
@@ -268,6 +277,7 @@ class Path:
         `direction`: direction of current square relative to the previous square
         `path`: previous square
     """
+
     def __init__(
         self,
         f_length: float,
@@ -287,19 +297,18 @@ class Path:
 
 
 class PathFinder:
-    """Class implementing A* pathfinding between two labyrinth squares.
-    """
+    """Class implementing A* pathfinding between two labyrinth squares."""
+
     def __init__(self, labyrinth: Labyrinth):
         self.labyrinth: Labyrinth = labyrinth
 
     def find_path(self, start: PointInt, end: PointInt) -> Path | None:
-        """"
-        A* search.
+        """A* search.
 
         Args:
             `start`: coordinates of start square
             `end`: coordinates of end square
-        
+
         Returns:
             shortest path connecting the two squares
         """
@@ -328,7 +337,7 @@ class PathFinder:
         end: PointInt,
     ):
         """Expands a node.
-        
+
         Existing corridor squares are weighed less.
         """
         if self._closed(closed_list, current_path.current):
@@ -388,6 +397,7 @@ class RoomGenerator:
         `size`: size of the grid, increases if rejection sampling fails for `max_tries`
         `max_tries`: max tries to fit one room in the grid
     """
+
     def __init__(
         self,
         num_rooms: int,

@@ -164,12 +164,7 @@ def make_quad_edge(org: Point, dest: Point) -> Edge:
 
 
 def splice(a: Edge, b: Edge):
-    """Splices two edges such that [something here, onext ring...]
-
-    Args:
-        a: first edge
-        b: second edge
-    """
+    """Splices two edges such that they are part of the same `onext` ring."""
     alpha = a.onext.rot
     beta = b.onext.rot
 

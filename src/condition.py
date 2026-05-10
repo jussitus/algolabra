@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from edge import Edge
 from condition_calc import ccw_int_exact, incircle_int_exact

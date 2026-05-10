@@ -3,6 +3,7 @@ from edge import Edge
 from graphics import Drawer
 from labyrinth import Labyrinth
 
+
 def dfs(start):
     q = deque()
     q.append(start)
@@ -20,6 +21,7 @@ def dfs(start):
             q.append(e.sym)
             res.add(e.sym)
     return list(res)
+
 
 def test_search_using_edge_connections_finds_everything():
     lab = Labyrinth(20, 1, 3, 5, 1, "square", 0)

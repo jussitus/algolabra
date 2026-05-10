@@ -64,7 +64,7 @@ def incircle_int_exact(a: Point, b: Point, c: Point, d: Point) -> bool:
 
 def ccw_int_exact(a: Point, b: Point, c: Point) -> bool:
     """Tests if the triangle `abc` is directed counterclockwise, also called Orient2D.
-    
+
     The points must have integer coordinates.
 
     Calculated with the following determinant:

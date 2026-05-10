@@ -16,10 +16,10 @@ class Drawer:
         self._ax.add_collection(lc)
 
     def add_circles(self, circles, **kwargs):
-        cc = [Circle(o,r) for (o, r) in circles]
+        cc = [Circle(o, r) for (o, r) in circles]
         pc = PatchCollection(cc, **kwargs)
         self._ax.add_collection(pc)
-        
+
     def show(self):
         self._ax.invert_yaxis()
         self._ax.axis("equal")

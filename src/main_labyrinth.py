@@ -29,8 +29,21 @@ def parse_arguments():
         "-md", "--min-dim", default=2, type=int, help="minimum width/height of rooms"
     )
     parser.add_argument("-g", "--gap", default=1, type=int, help="gap between rooms")
-    parser.add_argument("-sh", "--shape", default="circle", type=str, choices=["circle", "square"], help="shape of the labyrinth")
-    parser.add_argument("-c", "--cycle-score", default=0.2, type=float, help="percentage of cycles added to the labyrinth, 0-1.0")
+    parser.add_argument(
+        "-sh",
+        "--shape",
+        default="circle",
+        type=str,
+        choices=["circle", "square"],
+        help="shape of the labyrinth",
+    )
+    parser.add_argument(
+        "-c",
+        "--cycle-score",
+        default=0.2,
+        type=float,
+        help="percentage of cycles added to the labyrinth, 0-1.0",
+    )
     return parser.parse_args()
 
 
