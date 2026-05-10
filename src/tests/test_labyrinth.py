@@ -37,7 +37,7 @@ def test_search_using_edge_connections_finds_everything():
 
 
 def test_hand_on_wall_gets_back_to_start():
-    lab = Labyrinth(2, 1, 3, 5, 1, "square", 0.5)
+    lab = Labyrinth(20, 2, 3, 5, 1, "square", 0.5)
     start = lab.rooms[0].corner_edge
     edges_dfs = dfs(start)
     k = len(edges_dfs)
